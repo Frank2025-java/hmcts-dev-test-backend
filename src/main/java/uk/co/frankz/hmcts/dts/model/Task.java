@@ -2,6 +2,8 @@ package uk.co.frankz.hmcts.dts.model;
 
 import java.time.LocalDateTime;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class Task represents a domain entity, which
  * has properties title, description (optional),
@@ -10,15 +12,18 @@ import java.time.LocalDateTime;
  * and tasks are searchable with identifier.
  */
 public class Task {
-    private final long id;
+    private long id;
     private String title;
     private String description;
     private Status status;
     private LocalDateTime due;
 
     public Task() {
-        this.id = LongIdentifierGenerator.nextLongIdentifier();
-        this.status = Status.Created;
+        setId(LongIdentifierGenerator.nextLongIdentifier());
+        setTitle("");
+        setDescription(null);
+        setStatus(Status.Created);
+        setDue(LocalDateTime.now());
     }
 
     public long getId() {
@@ -41,8 +46,32 @@ public class Task {
         return due;
     }
 
-    public Task update(Status updateStatus) {
-        this.status = updateStatus;
+    public Task setId(long id) {
+        this.id = id;
+        return this;
+    }
+
+    public Task setTitle(String title) {
+
+        requireNonNull(title);
+        this.title = title;
+        return this;
+    }
+
+    public Task setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public Task setDue(LocalDateTime due) {
+        requireNonNull(due);
+        this.due = due;
+        return this;
+    }
+
+    public Task setStatus(Status status) {
+        requireNonNull(status);
+        this.status = status;
         return this;
     }
 }

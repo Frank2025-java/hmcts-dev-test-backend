@@ -6,4 +6,4 @@ package uk.co.frankz.hmcts.dts.model;
  */
 public enum Status {
     Created, Deleted;
-}
+ }

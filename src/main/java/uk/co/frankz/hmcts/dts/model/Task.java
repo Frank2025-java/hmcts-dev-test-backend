@@ -10,6 +10,8 @@ import static java.util.Objects.requireNonNull;
  * status and due date/time.
  * It is required to be able to modify the status,
  * and tasks are searchable with identifier.
+ * <p>
+ * The setters below, return "this", to allow chaining.
  */
 public class Task {
     private long id;
@@ -22,7 +24,7 @@ public class Task {
         setId(LongIdentifierGenerator.nextLongIdentifier());
         setTitle("");
         setDescription(null);
-        setStatus(Status.Created);
+        setStatus(Status.Initial);
         setDue(LocalDateTime.now());
     }
 

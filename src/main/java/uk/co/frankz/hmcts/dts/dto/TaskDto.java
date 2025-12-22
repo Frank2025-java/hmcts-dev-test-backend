@@ -1,7 +1,6 @@
 package uk.co.frankz.hmcts.dts.dto;
 
-import uk.co.frankz.hmcts.dts.model.LongIdentifierGenerator;
-import uk.co.frankz.hmcts.dts.model.Status;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -11,20 +10,35 @@ import java.time.LocalDateTime;
  */
 public class TaskDto {
 
-    //required
-    private long id;
+    /**
+     * required value, initialised with 0.
+     */
+    private long id = 0;
 
-    // required
-    private String title;
+    /**
+     * required non-null value, initialised with empty string
+     */
+    private String title = "";
 
-    // optional
+    /**
+     * optional value, initialised with null
+     */
     private String description;
 
-    // required
-    private String status;
+    /**
+     * required non-null value with the name of an enum in @see uk.co.frankz.hmcts.dts.model.Status,
+     * initialise with "Initial"
+     **/
+    private String status = "Initial";
 
-    // required
-    private LocalDateTime due;
+    /**
+     * required non-null value, initialised with current time.
+     * In the REST API String will be converted using ISO standard,
+     * which is left for Spring REST implementation to do.
+     *
+     * @see org.springframework.format.annotation.DateTimeFormat.ISO DATE_TIME
+     **/
+    private LocalDateTime due = LocalDateTime.now();
 
     public long getId() {
         return id;
@@ -62,7 +76,7 @@ public class TaskDto {
         return due;
     }
 
-    // use @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) in Spring rest api
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     public void setDue(LocalDateTime due) {
         this.due = due;
     }

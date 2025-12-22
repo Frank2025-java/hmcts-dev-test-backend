@@ -17,8 +17,8 @@ class TaskTest {
     private final Task testSubject = new Task();
 
     @Test
-    void shouldHaveInitialStatusCreated() {
-        assertSame(Status.Created, testSubject.getStatus());
+    void shouldHaveInitialStatus() {
+        assertSame(Status.Initial, new Task().getStatus());
     }
 
     @ParameterizedTest

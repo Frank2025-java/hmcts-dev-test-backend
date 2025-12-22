@@ -16,18 +16,18 @@ public class TaskDto {
     private long id = 0;
 
     /**
-     * required non-null value, initialised with empty string
+     * required non-null value, initialised with empty string.
      */
     private String title = "";
 
     /**
-     * optional value, initialised with null
+     * optional value, initialised with null.
      */
     private String description;
 
     /**
      * required non-null value with the name of an enum in @see uk.co.frankz.hmcts.dts.model.Status,
-     * initialise with "Initial"
+     * initialised with "Initial".
      **/
     private String status = "Initial";
 

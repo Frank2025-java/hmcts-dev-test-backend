@@ -5,5 +5,5 @@ package uk.co.frankz.hmcts.dts.model;
  * and currently we only have a requirement for an initial state and a deleted state.
  */
 public enum Status {
-    Created, Deleted;
+    Initial, Deleted;
  }

@@ -3,6 +3,15 @@ package uk.co.frankz.hmcts.dts.dto;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
 
+/**
+ * Mapper is a straight forward conversion between
+ * a Data Transfer Object and Domain class for entity Task.
+ * <p>
+ * By keeping the DTO and Domain separated, the
+ * implementation avoids challenges for more
+ * difficult requirements. It is a good practise for
+ * better maintainable code.
+ */
 public class Mapper {
     public Task toEntity(TaskDto dto) {
 

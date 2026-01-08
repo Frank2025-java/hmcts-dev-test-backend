@@ -16,7 +16,7 @@ public class MapperTest {
     // to be instantiated differently in spring MapperTest
     public Mapper testSubject;
 
-    public final static String TEST_ID = "123";
+    public static final String TEST_ID = "123";
 
     // to be instantiated differently in spring MapperTest
     public Task testTask;

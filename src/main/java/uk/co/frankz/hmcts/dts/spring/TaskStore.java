@@ -2,7 +2,6 @@ package uk.co.frankz.hmcts.dts.spring;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import uk.co.frankz.hmcts.dts.model.Task;
 
 /**
  * TaskStore represents the API of the back-end.

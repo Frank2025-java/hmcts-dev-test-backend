@@ -28,21 +28,6 @@ public class TaskStoreEclipseStoreTestConfig extends EclipseStoreClientConfigura
         foundationFactory = defaultEclipseStoreProvider;
     }
 
-//    @Bean
-//    @Primary
-//    EmbeddedStorageManager inMemoryStorageManager(
-//        @Autowired EclipseStoreProperties myConfiguration,
-//        @Autowired EmbeddedStorageManagerFactory managerFactory,
-//        @Autowired EmbeddedStorageFoundationFactory foundationFactory) {
-//
-//        // default is in-memory storage
-//        //myConfiguration.setStorageDirectory(tempDir.toFile().getPath());
-//
-//        EmbeddedStorageFoundation<?> storageFoundation = foundationFactory.createStorageFoundation(myConfiguration);
-//
-//        return managerFactory.createStorage(storageFoundation, false);
-//    }
-
     @Override
     public EmbeddedStorageFoundation<?> createEmbeddedStorageFoundation() {
         //return EmbeddedStorage.Foundation(Storage.Configuration(Storage.FileProvider(Path.of("unittest-storage"))));

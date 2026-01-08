@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.util.MockUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.co.frankz.hmcts.dts.model.Status;
@@ -21,7 +20,7 @@ class TaskStoreMockTest {
     @Autowired
     TaskStore testSubject;
 
-    final static LocalDateTime TEST_TIME = LocalDateTime.parse("2026-01-05T16:45:30");
+    static final LocalDateTime TEST_TIME = LocalDateTime.parse("2026-01-05T16:45:30");
 
     private TaskWithId testTask;
 

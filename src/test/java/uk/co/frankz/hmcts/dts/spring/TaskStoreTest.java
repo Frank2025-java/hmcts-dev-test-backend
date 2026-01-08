@@ -29,7 +29,7 @@ class TaskStoreTest {
     @Autowired
     TaskStore testSubject;
 
-    final static LocalDateTime TEST_TIME = LocalDateTime.parse("2026-01-05T16:45:30");
+    static final LocalDateTime TEST_TIME = LocalDateTime.parse("2026-01-05T16:45:30");
 
     private TaskWithId testTask;
 

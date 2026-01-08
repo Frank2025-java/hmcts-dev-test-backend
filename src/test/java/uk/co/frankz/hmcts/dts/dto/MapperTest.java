@@ -1,43 +1,76 @@
 package uk.co.frankz.hmcts.dts.dto;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class MapperTest {
+public class MapperTest {
 
-    Mapper testSubject = new Mapper();
+    // to be instantiated differently in spring MapperTest
+    public Mapper testSubject;
+
+    public final static String TEST_ID = "123";
+
+    // to be instantiated differently in spring MapperTest
+    public Task testTask;
+
+    @BeforeEach
+    public void setup() {
+        testTask = new Task();
+        testTask.setDescription("ddd");
+        LocalDateTime givenTime = LocalDateTime.parse("2025-12-18T16:45:30");
+        testTask.setDue(givenTime);
+        testTask.setTitle("t");
+        testTask.setStatus(Status.Deleted);
+
+        testSubject = new Mapper() {
+            @Override
+            protected Task newEntityWitId(String id) {
+                // ignore id
+                return new Task();
+            }
+
+            @Override
+            protected String getEntityId(Task taskWitId) {
+                return TEST_ID;
+            }
+        };
+    }
 
     @Test
     void shouldConvertTaskDtoToTaskAndBack() {
 
+        // given
         TaskDto given = new TaskDto();
-        given.setId(123);
+        given.setId(TEST_ID);
         given.setDescription("ddd");
         LocalDateTime givenTime = LocalDateTime.parse("2025-12-18T16:45:30");
         given.setDue(givenTime);
         given.setTitle("t");
         given.setStatus("Deleted");
 
+        // when
         TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
 
+        // then
         assertEqual(given, actual);
     }
 
-    private static void assertEqual(TaskDto given, TaskDto actual) {
-        assertEquals(given.getId(), actual.getId());
+    protected void assertEqual(TaskDto given, TaskDto actual) {
         assertEquals(given.getStatus(), actual.getStatus());
         assertEquals(given.getDescription(), actual.getDescription());
         assertEquals(given.getTitle(), actual.getTitle());
         assertEquals(given.getDue(), actual.getDue());
     }
 
-    private static void assertEqual(Task given, Task actual) {
-        assertEquals(given.getId(), actual.getId());
+    protected void assertEqual(Task given, Task actual) {
         assertEquals(given.getStatus(), actual.getStatus());
         assertEquals(given.getDescription(), actual.getDescription());
         assertEquals(given.getTitle(), actual.getTitle());
@@ -47,9 +80,11 @@ class MapperTest {
     @Test
     void shouldNotConvertTaskDtoInvalidStatus() {
 
+        // given
         TaskDto dto = new TaskDto();
         dto.setStatus("Invalid status");
 
+        // then exception, when
         assertThrows(
             IllegalArgumentException.class,
             () -> testSubject.toEntity(dto)
@@ -59,9 +94,11 @@ class MapperTest {
     @Test
     void shouldNotConvertTaskDtoNullStatus() {
 
+        // given
         TaskDto dto = new TaskDto();
         dto.setStatus(null);
 
+        // then exception, when
         assertThrows(
             NullPointerException.class,
             () -> testSubject.toEntity(dto)
@@ -71,29 +108,39 @@ class MapperTest {
     @Test
     void shouldConvertTaskDtoWithNullDescription() {
 
+        // given
         TaskDto given = new TaskDto();
         given.setDescription(null);
+
+        // when
         TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
 
+        // then
         assertEqual(given, actual);
     }
 
     @Test
     void shouldConvertTaskDtoWithBlankDescription() {
 
+        // given
         TaskDto given = new TaskDto();
         given.setDescription("");
+
+        // when
         TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
 
+        // then
         assertEqual(given, actual);
     }
 
     @Test
     void shouldNotConvertTaskDtoNullTitle() {
 
+        // given
         TaskDto dto = new TaskDto();
         dto.setTitle(null);
 
+        // then exception, when
         assertThrows(
             NullPointerException.class,
             () -> testSubject.toEntity(dto)
@@ -103,9 +150,11 @@ class MapperTest {
     @Test
     void shouldNotConvertTaskDtoNullDue() {
 
+        // given
         TaskDto dto = new TaskDto();
         dto.setDue(null);
 
+        // then exception, when
         assertThrows(
             NullPointerException.class,
             () -> testSubject.toEntity(dto)
@@ -115,9 +164,29 @@ class MapperTest {
     @Test
     void shouldConvertTaskDtoWithInitialDefaultsAndBack() {
 
+        // given
         TaskDto given = new TaskDto();
+
+        // when
         TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
 
+        // then
         assertEqual(given, actual);
     }
+
+    @Test
+    void shouldConvertTaskToDTOAndBack() {
+
+        // given
+        Task given = testTask;
+
+        // when
+        TaskDto actualDto = testSubject.toDto(given);
+        Task actual = testSubject.toEntity(actualDto);
+
+        // then
+        assertNotNull(actualDto);
+        assertEqual(given, actual);
+    }
+
 }

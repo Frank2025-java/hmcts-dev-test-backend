@@ -23,3 +23,8 @@ bin/main/application.yaml
 
 applicationinsights-agent-*.jar
 *.log
+/eclipse-store-storage-test/channel_0/channel_0_1.dat
+/eclipse-store-storage-test/channel_0/transactions_0.sft
+/eclipse-store-storage-test/channel_1/channel_1_1.dat
+/eclipse-store-storage-test/channel_1/transactions_1.sft
+/eclipse-store-storage-test/PersistenceTypeDictionary.ptd

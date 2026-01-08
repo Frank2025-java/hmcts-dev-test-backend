@@ -1,5 +1,7 @@
 package uk.co.frankz.hmcts.dts.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -8,12 +10,14 @@ import java.time.LocalDateTime;
  * Class TaskDto represents the data transfer object for the task domain entity.
  * Separating transfer and entities is wise, to avoid complex issues when maintaining the code.
  */
+@Setter
+@Getter
 public class TaskDto {
 
     /**
-     * required value, initialised with 0.
+     * optional value, initialised with null.
      */
-    private long id = 0;
+    private String id = null;
 
     /**
      * required non-null value, initialised with empty string.
@@ -35,50 +39,14 @@ public class TaskDto {
      * required non-null value, initialised with current time.
      * In the REST API String will be converted using ISO standard,
      * which is left for Spring REST implementation to do.
+     * <br/>
+     * Note that we allow here to have a Spring reference
+     * as the annotation, to complicate things not more
+     * like we do with the id field for Task.
      *
      * @see org.springframework.format.annotation.DateTimeFormat.ISO DATE_TIME
      **/
-    private LocalDateTime due = LocalDateTime.now();
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getDue() {
-        return due;
-    }
-
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    public void setDue(LocalDateTime due) {
-        this.due = due;
-    }
+    private LocalDateTime due = LocalDateTime.now();
 }
 

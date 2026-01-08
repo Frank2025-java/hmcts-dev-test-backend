@@ -16,7 +16,8 @@ import static java.util.Objects.requireNonNull;
  * The identifier is added by TaskId class, which is an extension
  * of this class, and is dependent on a Spring implementation
  * for generating the id.
- * <p>The setters in this class, return "this" to allow chaining,
+ * <br/>
+ * The setters in this class, return "this" to allow chaining,
  * which makes coding a bit less verbose.
  */
 @Getter

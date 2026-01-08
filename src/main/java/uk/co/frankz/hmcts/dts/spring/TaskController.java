@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import uk.co.frankz.hmcts.dts.model.Task;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -43,8 +42,9 @@ public class TaskController {
     @Operation(summary = "Create a Task with Title, Description (optional), Status, Due date/time.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Created Task and returned task with populated id.",
-            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class)) }),
-        @ApiResponse(responseCode = "400", description = "Title, Status, and Due are required fields.", content = @Content)
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))}),
+        @ApiResponse(responseCode = "400", description = "Title, Status, and Due are required fields.",
+            content = @Content)
     })
     @PostMapping(value = "/create-task", produces = "application/json")
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto newTask) {
@@ -54,7 +54,7 @@ public class TaskController {
             TaskDto display = map.toDto(stored);
 
             return ok(display);
-        } catch (IllegalArgumentException | NullPointerException e){
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // tiny bit more info to feedback

@@ -39,12 +39,12 @@ public class TaskDto {
      * required non-null value, initialised with current time.
      * In the REST API String will be converted using ISO standard,
      * which is left for Spring REST implementation to do.
-     *
-     * @see org.springframework.format.annotation.DateTimeFormat.ISO DATE_TIME
-     *
+     * <br/>
      * Note that we allow here to have a Spring reference
      * as the annotation, to complicate things not more
      * like we do with the id field for Task.
+     *
+     * @see org.springframework.format.annotation.DateTimeFormat.ISO DATE_TIME
      **/
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime due = LocalDateTime.now();

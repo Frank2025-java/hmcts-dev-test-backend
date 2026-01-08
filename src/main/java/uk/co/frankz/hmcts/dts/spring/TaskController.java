@@ -13,13 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import uk.co.frankz.hmcts.dts.dto.Mapper;
 import uk.co.frankz.hmcts.dts.model.Task;
-import uk.co.frankz.hmcts.dts.store.TaskStore;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
-import uk.gov.hmcts.reform.dev.models.ExampleCase;
-
-import java.time.LocalDateTime;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -32,7 +27,8 @@ public class TaskController {
     @Autowired
     private final Mapper map;
 
-    public TaskController(TaskStore taskStore, uk.co.frankz.hmcts.dts.spring.Mapper mapper) {
+    @Autowired
+    public TaskController(TaskStore taskStore, Mapper mapper) {
         this.store = taskStore;
         this.map = mapper;
     }
@@ -53,8 +49,8 @@ public class TaskController {
     @PostMapping(value = "/create-task", produces = "application/json")
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto newTask) {
         try {
-            Task input = map.toEntity(newTask);
-            Task stored = store.create(input);
+            TaskWithId input = map.toEntity(newTask);
+            TaskWithId stored = store.save(input);
             TaskDto display = map.toDto(stored);
 
             return ok(display);

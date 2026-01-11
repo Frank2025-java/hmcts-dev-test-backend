@@ -1,7 +1,10 @@
 package uk.co.frankz.hmcts.dts.dto;
 
+import jakarta.validation.constraints.NotNull;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
+
+import java.util.stream.Stream;
 
 /**
  * Mapper is a straight forward conversion between
@@ -45,5 +48,9 @@ public abstract class Mapper {
         dto.setDescription(entity.getDescription());
 
         return dto;
+    }
+
+    public @NotNull TaskDto[] toDto(@NotNull Stream<? extends Task> entities) {
+        return entities.map(this::toDto).toArray(TaskDto[]::new);
     }
 }

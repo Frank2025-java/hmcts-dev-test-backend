@@ -6,6 +6,8 @@ import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -187,6 +189,18 @@ public class MapperTest {
         // then
         assertNotNull(actualDto);
         assertEqual(given, actual);
+    }
+
+    @Test
+    void shouldConvertDTOStream() {
+        // given
+        List<Task> given = Arrays.asList(testTask, new Task(testTask));
+
+        // when
+        TaskDto[] actual = testSubject.toDto(given.stream());
+
+        // then
+        assertEquals(given.size(), actual.length);
     }
 
 }

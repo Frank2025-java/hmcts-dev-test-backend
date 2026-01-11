@@ -94,5 +94,15 @@ public class Task {
     public LocalDateTime getDue() {
         return LocalDateTime.parse(due, ISO_DATE_TIME);
     }
+
+    @Override
+    public String toString() {
+        return "Task{"
+            + "title='" + title + '\''
+            + ", description='" + description + '\''
+            + ", status='" + status + '\''
+            + ", due='" + due + '\''
+            + '}';
+    }
 }
 

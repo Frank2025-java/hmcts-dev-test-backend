@@ -14,7 +14,7 @@ import software.xdev.spring.data.eclipse.store.repository.config.EnableEclipseSt
 import java.nio.file.Path;
 
 @Configuration
-@EnableEclipseStoreRepositories
+@EnableEclipseStoreRepositories // Spring adaptor for the Eclipse Store implementation of TaskStore
 public class TaskStoreEclipseStoreConfig extends EclipseStoreClientConfiguration {
 
     private final EclipseStoreProperties properties;

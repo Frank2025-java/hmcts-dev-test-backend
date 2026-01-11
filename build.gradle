@@ -163,6 +163,8 @@ dependencies {
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
   implementation group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
 
+  implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
+
   implementation group: 'software.xdev', name: 'spring-data-eclipse-store', version: '2.5.3'
 
   implementation group: 'io.rest-assured', name: 'rest-assured'

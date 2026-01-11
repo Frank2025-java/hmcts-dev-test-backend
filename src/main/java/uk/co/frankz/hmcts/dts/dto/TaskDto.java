@@ -48,5 +48,16 @@ public class TaskDto {
      **/
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime due = LocalDateTime.now();
+
+    @Override
+    public String toString() {
+        return "TaskDto{"
+            + "id='" + id + '\''
+            + ", title='" + title + '\''
+            + ", description='" + description + '\''
+            + ", status='" + status + '\''
+            + ", due=" + due
+            + '}';
+    }
 }
 

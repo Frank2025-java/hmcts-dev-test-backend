@@ -3,6 +3,7 @@ package uk.co.frankz.hmcts.dts.spring;
 import org.springframework.stereotype.Component;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Task;
+import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 
 /**
  * Mapper represents the implementation of the conversion of a Data Transfer Object
@@ -26,20 +27,29 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
     protected String getEntityId(Task taskWithId) {
 
         if (taskWithId instanceof TaskWithId) {
-            return ((TaskWithId) taskWithId).getId();
+            try {
+                return ((TaskWithId) taskWithId).getId();
+            } catch (Exception e) {
+                throw new TaskInvalidArgumentException(taskWithId, e);
+            }
+        } else {
+            throw new TaskInvalidArgumentException(taskWithId, "Argument taskWithId is not an instance of TaskWithId");
         }
-
-        throw new IllegalArgumentException("Argument taskWithId is not an instance of TaskWithId");
     }
 
     /**
      * This override makes the usage easier by adding an upcast.
+     *
      * @param dto Data Transfer Object
      * @return Entity with id.
      */
     @Override
     public TaskWithId toEntity(TaskDto dto) {
 
-        return (TaskWithId) super.toEntity(dto);
+        try {
+            return (TaskWithId) super.toEntity(dto);
+        } catch (Exception e) {
+            throw new TaskInvalidArgumentException(dto.toString(), e);
+        }
     }
 }

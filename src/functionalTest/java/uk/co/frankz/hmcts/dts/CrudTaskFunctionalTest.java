@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-class CRUDTaskFunctionalTest {
+class CrudTaskFunctionalTest {
 
     protected static final String CONTENT_TYPE_VALUE = "application/json";
 
-    private static final Logger LOG = LoggerFactory.getLogger(CRUDTaskFunctionalTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CrudTaskFunctionalTest.class);
 
     public static final String ANSI_PURPLE = "\u001B[35m";
 

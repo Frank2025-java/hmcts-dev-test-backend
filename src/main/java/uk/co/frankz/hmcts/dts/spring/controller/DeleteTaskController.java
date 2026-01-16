@@ -2,13 +2,13 @@ package uk.co.frankz.hmcts.dts.spring.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
@@ -16,6 +16,7 @@ import uk.co.frankz.hmcts.dts.spring.TaskService;
 import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
+@RequestMapping("/task")
 public class DeleteTaskController {
 
     @Autowired
@@ -32,13 +33,12 @@ public class DeleteTaskController {
 
     @Operation(summary = "Delete a Task by ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "202", description = "Task has been deleted.",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
-        @ApiResponse(responseCode = "400", description = "No task matching the provided id.", content = @Content),
-        @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
+        @ApiResponse(responseCode = "202", description = "Task has been deleted successfully, or "
+            + "there was no task matching the provided id.", content = @Content),
+        @ApiResponse(responseCode = "500", description = "Technical exceptions.", content = @Content)
     })
-    @PostMapping(value = "/delete-task", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Void> deleteTask(@RequestBody String id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable String id) {
 
         service.delete(id);
 

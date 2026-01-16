@@ -7,6 +7,7 @@ import org.eclipse.store.storage.embedded.types.EmbeddedStorage;
 import org.eclipse.store.storage.embedded.types.EmbeddedStorageFoundation;
 import org.eclipse.store.storage.types.Storage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import software.xdev.spring.data.eclipse.store.repository.config.EclipseStoreClientConfiguration;
 import software.xdev.spring.data.eclipse.store.repository.config.EnableEclipseStoreRepositories;
@@ -16,6 +17,9 @@ import java.nio.file.Path;
 @Configuration
 @EnableEclipseStoreRepositories // Spring adaptor for the Eclipse Store implementation of TaskStore
 public class TaskStoreEclipseStoreConfig extends EclipseStoreClientConfiguration {
+
+    @Value("${org.eclipse.store.storage-directory:eclipse-storage-task}")
+    private String dir;
 
     private final EclipseStoreProperties properties;
     private final EmbeddedStorageFoundationFactory foundationFactory;
@@ -34,8 +38,7 @@ public class TaskStoreEclipseStoreConfig extends EclipseStoreClientConfiguration
 
     @Override
     public EmbeddedStorageFoundation<?> createEmbeddedStorageFoundation() {
-        return EmbeddedStorage.Foundation(Storage.Configuration(Storage.FileProvider(Path.of("eclipse-storage-task"))));
-
+        return EmbeddedStorage.Foundation(Storage.Configuration(Storage.FileProvider(Path.of(dir))));
     }
 
 }

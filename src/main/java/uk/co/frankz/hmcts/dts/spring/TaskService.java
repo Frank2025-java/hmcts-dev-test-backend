@@ -91,7 +91,7 @@ public class TaskService {
         final Status newStatus;
 
         try {
-            newStatus = Status.valueOf(status);
+            newStatus = Status.parse(status);
         } catch (IllegalArgumentException e) {
             throw new TaskInvalidArgumentException(status, e);
         }

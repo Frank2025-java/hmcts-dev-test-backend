@@ -5,6 +5,7 @@ import uk.co.frankz.hmcts.dts.model.Task;
 public class TaskInvalidArgumentException extends TaskException {
 
     public TaskInvalidArgumentException(Task task, String s) {
+
         super(task, s);
     }
 
@@ -14,6 +15,12 @@ public class TaskInvalidArgumentException extends TaskException {
     }
 
     public TaskInvalidArgumentException(String s, Exception e) {
+
         super(s, e);
+    }
+
+    public TaskInvalidArgumentException(String message) {
+
+        super(message);
     }
 }

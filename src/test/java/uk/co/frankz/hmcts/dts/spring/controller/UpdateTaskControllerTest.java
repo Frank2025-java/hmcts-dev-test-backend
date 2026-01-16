@@ -8,7 +8,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import uk.co.frankz.hmcts.dts.dto.IdStatusDto;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
@@ -59,13 +58,12 @@ class UpdateTaskControllerTest {
 
         // given
         Status givenStatus = Status.Initial;
-        IdStatusDto given = new IdStatusDto(testId, givenStatus.name());
 
         when(mockService.update(any(), any())).thenReturn(testResultEntity);
         when(mockMapper.toDto((TaskWithId) any())).thenReturn(testResultDto);
 
         // when
-        ResponseEntity<TaskDto> actual = testSubject.updateTaskStatus(given);
+        ResponseEntity<TaskDto> actual = testSubject.updateTaskStatus(testId, givenStatus.name());
 
         // then
         assertEquals(OK, actual.getStatusCode());
@@ -103,10 +101,9 @@ class UpdateTaskControllerTest {
         when(mockService.update(any(), any())).thenReturn(new TaskWithId());
 
         String givenStatus = Status.Initial.name();
-        IdStatusDto given = new IdStatusDto(testId, givenStatus);
 
         // when, then exception which will be handled by Spring
-        Exception actual = assertThrows(TaskException.class, () -> testSubject.updateTaskStatus(given));
+        Exception actual = assertThrows(TaskException.class, () -> testSubject.updateTaskStatus(testId, givenStatus));
 
         // then
         verify(mockService).update(eq(testId), eq(givenStatus));
@@ -138,16 +135,15 @@ class UpdateTaskControllerTest {
 
         // given
         String givenStatus = Status.Initial.name();
-        IdStatusDto given = new IdStatusDto(testId, givenStatus);
         String expectedMsg = "Hi there";
         Exception expectedEx = new TaskException(expectedMsg);
         when(mockService.update(any(), any())).thenThrow(expectedEx);
 
         // when, then exception which will be handled by Spring
-        Exception actual = assertThrows(TaskException.class, () -> testSubject.updateTaskStatus(given));
+        Exception actual = assertThrows(TaskException.class, () -> testSubject.updateTaskStatus(testId, givenStatus));
 
         // then
-        verify(mockService).update(eq(given.getId()), eq(givenStatus));
+        verify(mockService).update(eq(testId), eq(givenStatus));
         assertTrue(actual.getMessage().contains(expectedMsg));
     }
 

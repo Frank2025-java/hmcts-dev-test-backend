@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import uk.co.frankz.hmcts.dts.dto.IdStatusDto;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Status;
 
@@ -54,7 +53,7 @@ class CrudTaskFunctionalTest {
 
     @BeforeEach
     public void setUp() {
-        RestAssured.baseURI = testUrl;
+        RestAssured.baseURI = testUrl + "/task";
         RestAssured.useRelaxedHTTPSValidation();
 
         log("Before testTask=" + testTaskInMemory);
@@ -83,13 +82,13 @@ class CrudTaskFunctionalTest {
         String testTitle = "test title";
         testTask.setTitle(testTitle);
 
-        log("create-task:" + testTask);
+        log("create:" + testTask);
 
         Response response = given()
             .contentType(ContentType.JSON)
             .body(testTask)
             .when()
-            .post("/create-task")
+            .post("/create")
             .then()
             .extract()
             .response();
@@ -106,13 +105,13 @@ class CrudTaskFunctionalTest {
     void shouldFailCreateTaskWithExistingId() {
         TaskDto testTask = testTaskInMemory;
 
-        log("create-task:" + testTask);
+        log("create:" + testTask);
 
         Response response = given()
             .contentType(ContentType.JSON)
             .body(testTask)
             .when()
-            .post("/create-task")
+            .post("/create")
             .then()
             .extract()
             .response();
@@ -123,16 +122,20 @@ class CrudTaskFunctionalTest {
     @Test
     @Order(3)
     void shouldUpdateStatus() throws JSONException {
+        String testTaskId = testTaskInMemory.getId();
         String testStatus = Status.Deleted.name();
-        IdStatusDto requestBody = new IdStatusDto(testTaskInMemory.getId(), testStatus);
 
-        log("update-task-by-id:" + requestBody);
+        String testIdStatusURI = "/update"
+            + "/" + testTaskId
+            + "/status/" + testStatus;
+
+        log("update-task-by-id:" + testIdStatusURI);
+
 
         Response response = given()
             .contentType(ContentType.JSON)
-            .body(requestBody)
             .when()
-            .post("/update-task-by-id")
+            .put(testIdStatusURI)
             .then()
             .extract()
             .response();
@@ -149,13 +152,13 @@ class CrudTaskFunctionalTest {
         TaskDto testTask = testTaskInMemory;
         testTask.setTitle(testTitle);
 
-        log("update-task:" + testTask);
+        log("update:" + testTask);
 
         Response response = given()
             .contentType(ContentType.JSON)
             .body(testTask)
             .when()
-            .post("/update-task")
+            .post("/update")
             .then()
             .extract()
             .response();
@@ -171,9 +174,8 @@ class CrudTaskFunctionalTest {
 
         Response response = given()
             .contentType(ContentType.JSON)
-            .body(testTaskInMemory.getId())
             .when()
-            .post("/get-task")
+            .get("/get/" + testTaskInMemory.getId())
             .then()
             .extract()
             .response();
@@ -193,7 +195,7 @@ class CrudTaskFunctionalTest {
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .post("/get-all-tasks")
+            .get("/get-all-tasks")
             .then()
             .extract()
             .response();
@@ -213,9 +215,8 @@ class CrudTaskFunctionalTest {
 
         Response response = given()
             .contentType(ContentType.JSON)
-            .body(testTaskId)
             .when()
-            .post("/delete-task")
+            .delete("/delete/" + testTaskId)
             .then()
             .extract()
             .response();

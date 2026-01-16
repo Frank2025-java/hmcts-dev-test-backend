@@ -29,7 +29,7 @@ public abstract class Mapper {
 
     public Task toEntity(TaskDto dto) {
 
-        Status status = Status.valueOf(dto.getStatus());
+        Status status = Status.parse(dto.getStatus());
 
         return newEntityWitId(dto.getId())
             .setTitle(dto.getTitle())

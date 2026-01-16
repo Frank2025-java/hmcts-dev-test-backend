@@ -15,10 +15,19 @@ Spring typically drives one to use JPA for persistence, but I choose to use Ecli
 more suitable for small Serverless backend services, which I think this Task backend application likely
 would be.
 
-[JPA versus Eclipse Store](img/jpa_vs_eclipsestore.webp)
+![JPA versus Eclipse Store](img/jpa_vs_eclipsestore.webp)
 
-That undermind proofed to be a learning curve, especially with testing and combination with Spring Boot.
+That proofed to be a learning curve, especially with testing and combination with Spring Boot.
 With the Spring annotations and persistence requirements for Eclipse Store framework, the TDD approach
 changed to Behavioural Driven Tests and a separation of types with Spring annotations in a package.
+I have added a "life cycle" (Create, Retrieve, Update, Delete) functional test, using RestAssured, which
+was new to me.
+
+Then focussed on documentation and had to make a change in the sample framework to get my Controller classes
+scanned by Swagger, by setting a property in application.yaml.
+I also added an Eclipse Store property that specifies the directory for the data repository.
+
+To illustrate that Eclipse Store offers a wider range of repository types is in this
+[screenshot](img/eclipsestore-targets.png) from the Eclipse Store reference manual.
 
 

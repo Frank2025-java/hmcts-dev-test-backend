@@ -144,7 +144,7 @@ repositories {
 
 ext {
   log4JVersion = "2.25.3"
-  logbackVersion = "1.5.22"
+  logbackVersion = "1.5.24"
 }
 
 ext['snakeyaml.version'] = '2.2'
@@ -179,7 +179,8 @@ dependencies {
   }
 }
 
-mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+//mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+mainClassName = 'uk.co.frankz.hmcts.dts.spring.Application'
 
 bootJar {
   archiveFileName = "test-backend.jar"

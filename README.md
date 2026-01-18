@@ -124,3 +124,4 @@ To illustrate that Eclipse Store offers a wider range of repository types is in 
 [screenshot](img/eclipsestore-targets.png) from the Eclipse Store reference manual.
 
 
+

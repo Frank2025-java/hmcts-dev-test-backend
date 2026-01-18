@@ -179,7 +179,8 @@ dependencies {
   }
 }
 
-mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+//mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+mainClassName = 'uk.co.frankz.hmcts.dts.spring.Application'
 
 bootJar {
   archiveFileName = "test-backend.jar"

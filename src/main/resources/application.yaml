@@ -24,6 +24,7 @@ springdoc:
   api-docs:
     enabled: true # for security concerns this should be set to false
   packagesToScan: uk.co.frankz.hmcts.dts.spring.controller
+  #packagesToScan: uk.gov.hmcts.reform.dev.controllers
   writer-with-order-by-keys: true
 
 spring:

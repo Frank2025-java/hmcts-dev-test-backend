@@ -171,6 +171,13 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
+  implementation libs.commons.collection4
+  implementation libs.eclipse.store.spring
+  implementation libs.aws.lambda.core
+  implementation libs.aws.lambda.events
+  implementation libs.aws.dynamobb
+  implementation libs.aws.dynamobb.enh
+
   testImplementation(platform('org.junit:junit-bom:6.0.2'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -187,6 +194,14 @@ bootJar {
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
+  }
+}
+
+task awsZip(type: Zip) {
+  from compileJava
+  from processResources
+  into('lib') {
+    from configurations.runtimeClasspath
   }
 }
 

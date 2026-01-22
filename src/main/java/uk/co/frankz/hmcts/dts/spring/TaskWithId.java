@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import uk.co.frankz.hmcts.dts.model.EntityWithId;
 import uk.co.frankz.hmcts.dts.model.Task;
 
 import static jakarta.persistence.GenerationType.AUTO;
@@ -22,7 +23,7 @@ import static jakarta.persistence.GenerationType.AUTO;
  */
 @Getter
 @Setter
-public class TaskWithId extends Task {
+public class TaskWithId extends Task implements EntityWithId {
     @Id
     @GeneratedValue(strategy = AUTO)
     private String id;
@@ -37,8 +38,8 @@ public class TaskWithId extends Task {
 
     public TaskWithId(Task original) {
         super(original);
-        if (original instanceof TaskWithId) {
-            this.id = ((TaskWithId) original).getId();
+        if (original instanceof EntityWithId) {
+            this.id = ((EntityWithId) original).getId();
         }
     }
 

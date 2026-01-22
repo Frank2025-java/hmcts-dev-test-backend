@@ -1,4 +1,4 @@
-package uk.co.frankz.hmcts.dts.spring;
+package uk.co.frankz.hmcts.dts.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,9 +7,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.frankz.hmcts.dts.model.EntityWithId;
+import uk.co.frankz.hmcts.dts.model.ITask;
 import uk.co.frankz.hmcts.dts.model.Status;
-import uk.co.frankz.hmcts.dts.model.Task;
 import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
+import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNotFoundException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskStoreException;
 
@@ -27,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -36,29 +39,47 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
-    TaskService testSubject;
+    // Simulates and implementation for a repository generating an id and storing a Task entity
+    interface TestTaskWithId extends ITask, EntityWithId {
+    }
+
+    uk.co.frankz.hmcts.dts.service.TaskService<TestTaskWithId> testSubject;
 
     @Mock
-    TaskStore mockTaskStore;
+    TestTaskWithId testTaskMaiden;
+
+    private static final String TEST_ID = "123";
+
+    @Mock
+    TestTaskWithId testTaskWithId;
+
+    @Mock
+    TaskStore<TestTaskWithId> mockTaskStore;
 
     @Captor
-    ArgumentCaptor<TaskWithId> taskCaptor;
+    ArgumentCaptor<TestTaskWithId> taskCaptor;
 
     @BeforeEach
     void setup() {
-        testSubject = new TaskService(mockTaskStore);
+
+        testSubject = new uk.co.frankz.hmcts.dts.service.TaskService<>(mockTaskStore);
+
+        lenient().when(testTaskMaiden.isNew()).thenReturn(true);
+        lenient().when(testTaskMaiden.getId()).thenReturn(null);
+        lenient().when(testTaskWithId.isNew()).thenReturn(false);
+        lenient().when(testTaskWithId.getId()).thenReturn(TEST_ID);
     }
 
     @Test
     void shouldStoreEntity() {
 
         // given
-        TaskWithId given = new TaskWithId();
-        TaskWithId mockStored = new TaskWithId();
+        TestTaskWithId given = testTaskMaiden;
+        TestTaskWithId mockStored = testTaskWithId;
         when(mockTaskStore.save(any())).thenReturn(mockStored);
 
         // when
-        Task actual = testSubject.createTask(given);
+        TestTaskWithId actual = testSubject.createTask(given);
 
         // then
         verify(mockTaskStore).save(taskCaptor.capture());
@@ -69,7 +90,7 @@ class TaskServiceTest {
     void shouldExceptCreateTaskOnNull() {
 
         // given
-        TaskWithId given = null;
+        TestTaskWithId given = null;
 
         // when
         Exception actual = assertThrows(TaskInvalidArgumentException.class, () -> testSubject.createTask(given));
@@ -82,7 +103,7 @@ class TaskServiceTest {
     void shouldExceptCreateTaskOnExistingTask() {
 
         // given
-        TaskWithId given = mock(TaskWithId.class);
+        TestTaskWithId given = testTaskWithId;
         when(given.isNew()).thenReturn(Boolean.FALSE);
 
         // when
@@ -96,7 +117,7 @@ class TaskServiceTest {
     void shouldPropagateStoreExceptionOnCreateTask() {
 
         // given
-        TaskWithId given = new TaskWithId();
+        TestTaskWithId given = testTaskMaiden;
         String expectedMsg = "hello";
         when(mockTaskStore.save(any())).thenThrow(new RuntimeException(expectedMsg));
 
@@ -112,12 +133,12 @@ class TaskServiceTest {
     void shouldFindEntityById() {
 
         // given
-        String given = "1234";
-        Optional<TaskWithId> mockStored = Optional.of(new TaskWithId());
+        String given = TEST_ID;
+        Optional<TestTaskWithId> mockStored = Optional.of(testTaskWithId);
         when(mockTaskStore.findById(any())).thenReturn(mockStored);
 
         // when
-        Task actual = testSubject.get(given);
+        TestTaskWithId actual = testSubject.get(given);
 
         // then
         verify(mockTaskStore).findById(eq(given));
@@ -128,8 +149,8 @@ class TaskServiceTest {
     void shouldExceptOnNotFoundById() {
 
         // given
-        String given = "1234";
-        Optional<TaskWithId> mockStored = Optional.empty();
+        String given = TEST_ID;
+        Optional<TestTaskWithId> mockStored = Optional.empty();
         when(mockTaskStore.findById(any())).thenReturn(mockStored);
 
         // when
@@ -144,13 +165,12 @@ class TaskServiceTest {
     void shouldPropagateStoreExceptionOnFindById() {
 
         // given
-        String given = "1234";
         String expectedMsg = "hello";
         Exception expectedEx = new RuntimeException(expectedMsg);
         when(mockTaskStore.findById(any())).thenThrow(expectedEx);
 
         // when
-        Exception actual = assertThrows(TaskStoreException.class, () -> testSubject.get(given));
+        Exception actual = assertThrows(TaskStoreException.class, () -> testSubject.get(TEST_ID));
 
         // then
         verify(mockTaskStore).findById(any());
@@ -161,15 +181,15 @@ class TaskServiceTest {
     void shouldFindAllEntities() {
 
         // given
-        List<TaskWithId> given = Arrays.asList(new TaskWithId(), new TaskWithId());
+        List<TestTaskWithId> given = Arrays.asList(mock(TestTaskWithId.class), mock(TestTaskWithId.class));
         when(mockTaskStore.findAll()).thenReturn(given);
 
         // when
-        Stream<TaskWithId> actual = testSubject.getAll();
+        Stream<TestTaskWithId> actual = testSubject.getAll();
 
         // then
         verify(mockTaskStore).findAll();
-        List<TaskWithId> actualList = actual.toList();
+        List<TestTaskWithId> actualList = actual.toList();
         assertEquals(given.size(), actualList.size());
     }
 
@@ -177,7 +197,7 @@ class TaskServiceTest {
     void shouldExceptOnNoneFound() {
 
         // given
-        List<TaskWithId> givenEmpty = new ArrayList<>();
+        List<TestTaskWithId> givenEmpty = new ArrayList<>();
         when(mockTaskStore.findAll()).thenReturn(givenEmpty);
 
         // when
@@ -207,7 +227,7 @@ class TaskServiceTest {
     void shouldDeleteEntityById() {
 
         // given
-        String given = "1234";
+        String given = TEST_ID;
 
         // when
         testSubject.delete(given);
@@ -220,7 +240,7 @@ class TaskServiceTest {
     void shouldPropagateStoreExceptionOnDelete() {
 
         // given
-        String given = "1234";
+        String given = TEST_ID;
         String expectedMsg = "hello";
         Exception expectedEx = new RuntimeException(expectedMsg);
         doThrow(expectedEx).when(mockTaskStore).deleteById(any());
@@ -237,20 +257,19 @@ class TaskServiceTest {
     void shouldUpdateStatusEntityById() {
 
         // given - spy to stub some methods using doReturn, but otherwise invoke the real method
-        final TaskService mockedTestSubject = spy(testSubject);
+        final TaskService<TestTaskWithId> mockedTestSubject = spy(testSubject);
 
-        final String givenId = "1234";
+        final String givenId = TEST_ID;
         final Status givenStatus = Status.Deleted;
 
-        final TaskWithId givenStored = new TaskWithId();
-        givenStored.setId(givenId);
+        final TestTaskWithId givenStored = testTaskWithId;
         doReturn(givenStored).when(mockedTestSubject).get(any());
 
-        final TaskWithId expectedUpdated = new TaskWithId();
+        final TestTaskWithId expectedUpdated = mock(TestTaskWithId.class);
         doReturn(expectedUpdated).when(mockedTestSubject).update(any());
 
         // when
-        TaskWithId actual = mockedTestSubject.update(givenId, givenStatus.name());
+        TestTaskWithId actual = mockedTestSubject.update(givenId, givenStatus.name());
 
         // then
         assertSame(expectedUpdated, actual);
@@ -263,29 +282,28 @@ class TaskServiceTest {
     void shouldExceptOnInvalidStatus() {
 
         // given
-        String givenId = "1234";
         String givenStatus = "no such status";
 
         // when
         Exception actual = assertThrows(
-            TaskInvalidArgumentException.class,
-            () -> testSubject.update(givenId, givenStatus)
+            TaskNoMatchException.class,
+            () -> testSubject.update(TEST_ID, givenStatus)
         );
 
         // then
-        assertTrue(actual.getMessage().contains(givenStatus));
+        assertTrue(actual.getMessage().contains(givenStatus), actual.getMessage());
     }
 
     @Test
     void shouldUpdateEntity() {
 
         // given
-        TaskWithId given = new TaskWithId();
-        TaskWithId expectedUpdated = new TaskWithId();
+        TestTaskWithId given = testTaskWithId;
+        TestTaskWithId expectedUpdated = mock(TestTaskWithId.class);
         when(mockTaskStore.save(any())).thenReturn(expectedUpdated);
 
         // when
-        TaskWithId actual = testSubject.update(given);
+        TestTaskWithId actual = testSubject.update(given);
 
         // then
         verify(mockTaskStore).save(taskCaptor.capture());
@@ -297,7 +315,7 @@ class TaskServiceTest {
     void shouldPropagateSaveExceptionOnUpdate() {
 
         // given
-        TaskWithId given = new TaskWithId();
+        TestTaskWithId given = testTaskWithId;
         String expectedMsg = "hello";
         doThrow(new RuntimeException(expectedMsg)).when(mockTaskStore).save(any());
 

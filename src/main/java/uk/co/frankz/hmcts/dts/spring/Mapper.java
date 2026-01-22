@@ -23,20 +23,6 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
         return entityWithId;
     }
 
-    @Override
-    protected String getEntityId(Task taskWithId) {
-
-        if (taskWithId instanceof TaskWithId) {
-            try {
-                return ((TaskWithId) taskWithId).getId();
-            } catch (Exception e) {
-                throw new TaskInvalidArgumentException(taskWithId, e);
-            }
-        } else {
-            throw new TaskInvalidArgumentException(taskWithId, "Argument taskWithId is not an instance of TaskWithId");
-        }
-    }
-
     /**
      * This override makes the usage easier by adding an upcast.
      *

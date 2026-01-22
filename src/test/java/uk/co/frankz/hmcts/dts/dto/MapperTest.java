@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
+import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class MapperTest {
 
         // then exception, when
         assertThrows(
-            IllegalArgumentException.class,
+            TaskNoMatchException.class,
             () -> testSubject.toEntity(dto)
         );
     }
@@ -102,7 +103,7 @@ public class MapperTest {
 
         // then exception, when
         assertThrows(
-            NullPointerException.class,
+            TaskNoMatchException.class,
             () -> testSubject.toEntity(dto)
         );
     }

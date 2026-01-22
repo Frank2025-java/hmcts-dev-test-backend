@@ -3,6 +3,8 @@ package uk.co.frankz.hmcts.dts.spring;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * TaskStore represents the API of the back-end.
  * <br>
@@ -16,5 +18,20 @@ import org.springframework.stereotype.Repository;
  * pinning the application down to an expensive RDS database.
  */
 @Repository
-public interface TaskStore extends CrudRepository<TaskWithId, String> {
+public interface TaskStore
+    extends
+    CrudRepository<TaskWithId, String>,
+    uk.co.frankz.hmcts.dts.service.TaskStore<TaskWithId> {
+
+    @Override
+    <S extends TaskWithId> S save(S entity);
+
+    @Override
+    Optional<TaskWithId> findById(String s);
+
+    @Override
+    void deleteById(String s);
+
+    @Override
+    Iterable<TaskWithId> findAll();
 }

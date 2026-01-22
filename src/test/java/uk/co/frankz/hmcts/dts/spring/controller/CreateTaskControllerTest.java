@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @ExtendWith(MockitoExtension.class)
 class CreateTaskControllerTest {
@@ -64,7 +64,7 @@ class CreateTaskControllerTest {
         ResponseEntity<TaskDto> actual = testSubject.createTask(given);
 
         // then
-        assertEquals(OK, actual.getStatusCode());
+        assertEquals(CREATED, actual.getStatusCode());
         verify(mockService).createTask(taskCaptor.capture());
         assertSame(testInputEntity, taskCaptor.getValue());
         assertEquals(testId, actual.getBody().getId());

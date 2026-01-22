@@ -7,7 +7,6 @@ import org.mockito.internal.util.MockUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.co.frankz.hmcts.dts.model.Status;
-import uk.gov.hmcts.reform.dev.Application;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.eclipse.store.storage-directory=eclipse-store-storage-test",
         "org.eclipse.store.channel-count=2"
     },
-    classes = {TaskStoreEclipseStoreTestConfig.class, Application.class})
+    classes = Application.class)
 class TaskStoreTest {
 
     @Autowired

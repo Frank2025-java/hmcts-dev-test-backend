@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.spring.Application;
@@ -67,12 +68,23 @@ class CrudTaskFunctionalTest {
     }
 
     private TaskDto assertValidTaskResponse(Response response) {
-        assertEquals(200, response.statusCode());
+
+        return assertValidTaskResponse(HttpStatus.OK, response);
+    }
+
+    private TaskDto assertValidTaskResponse(HttpStatus expectedStatus, Response response) {
+
+        assertNotNull(response);
+
+        HttpStatus actualStatus = HttpStatus.valueOf(response.statusCode());
+        assertEquals(expectedStatus, actualStatus);
+
         assertNotNull(response.body());
         TaskDto actual = response.body().as(TaskDto.class);
         assertTrue(StringUtils.isNotBlank(actual.getId()));
         assertNotNull(actual.getStatus());
         assertNotNull(actual.getDue());
+
         return actual;
     }
 
@@ -94,7 +106,7 @@ class CrudTaskFunctionalTest {
             .extract()
             .response();
 
-        TaskDto actual = assertValidTaskResponse(response);
+        TaskDto actual = assertValidTaskResponse(HttpStatus.CREATED, response);
         assertNotNull(actual.getId());
         assertEquals(testTitle, actual.getTitle());
 
@@ -131,7 +143,6 @@ class CrudTaskFunctionalTest {
             + "/status/" + testStatus;
 
         log("update-task-by-id:" + testIdStatusURI);
-
 
         Response response = given()
             .contentType(ContentType.JSON)

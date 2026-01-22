@@ -1,0 +1,17 @@
+[versions]
+awssdk = "2.25.0"
+
+[plugins]
+
+[bundles]
+
+[libraries]
+commons-collection4     = { group = 'org.apache.commons', name = 'commons-collections4', version = "4.5.0" }
+
+eclipse-store-spring    = { group = 'software.xdev', name = 'spring-data-eclipse-store', version = '2.5.3' }
+
+aws-lambda-core         = { group = "com.amazonaws", name = "aws-lambda-java-core", version = "1.4.0" }
+aws-lambda-events       = { group = "com.amazonaws", name = "aws-lambda-java-events", version = "3.16.1" }
+aws-dynamobb            = { group = "software.amazon.awssdk", name = "dynamodb", version.ref = "awssdk" }
+aws-dynamobb-enh        = { group = "software.amazon.awssdk", name = "dynamodb-enhanced", version.ref = "awssdk" }
+

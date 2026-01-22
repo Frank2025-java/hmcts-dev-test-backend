@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
+import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
 import uk.co.frankz.hmcts.dts.spring.TaskWithId;
@@ -73,7 +74,7 @@ public class UpdateTaskController {
             description = "Other exceptions.",
             content = @Content)
     })
-    @PostMapping(value = "/update", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = Action.PATH.UPDATE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto task) {
 
         TaskWithId input = map.toEntity(task);

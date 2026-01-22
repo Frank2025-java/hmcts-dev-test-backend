@@ -1,9 +1,14 @@
 package uk.co.frankz.hmcts.dts.model.exception;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.co.frankz.hmcts.dts.model.EntityWithId;
 import uk.co.frankz.hmcts.dts.model.Task;
 
 public class TaskException extends IllegalArgumentException {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TaskException.class);
 
     public TaskException(Task task, String s) {
         super(toTaskString(task) + ": " + s);
@@ -29,7 +34,7 @@ public class TaskException extends IllegalArgumentException {
         return task == null ? "Task null" : task.toString();
     }
 
-    private static String toString(Exception e) {
+    public static String toString(Exception e) {
         if (e instanceof TaskException) {
             // Do not double wrap TaskException
             return e.getMessage();
@@ -41,4 +46,14 @@ public class TaskException extends IllegalArgumentException {
             return e.getMessage();
         }
     }
+
+    protected static Task task(EntityWithId taskWithId) {
+        if (taskWithId instanceof Task) {
+            return (Task) taskWithId;
+        } else {
+            // exception messages might not handle null, just have something to feedback.
+            return new Task().setDescription(String.valueOf(taskWithId));
+        }
+    }
+
 }

@@ -20,5 +20,4 @@ public class TaskExceptionHandler {
     public ResponseEntity<Object> handleGenericException(Exception exception) {
         return new ResponseEntity<>(exception.getMessage(), INTERNAL_SERVER_ERROR);
     }
-
 }

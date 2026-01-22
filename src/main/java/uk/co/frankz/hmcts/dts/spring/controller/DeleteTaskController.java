@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
 
@@ -37,7 +38,7 @@ public class DeleteTaskController {
             + "there was no task matching the provided id.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Technical exceptions.", content = @Content)
     })
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(Action.PATH.DELETE)
     public ResponseEntity<Void> deleteTask(@PathVariable String id) {
 
         service.delete(id);

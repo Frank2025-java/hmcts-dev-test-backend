@@ -11,7 +11,7 @@ The AWS Lambda technology tends to be very low-cost and low-maintenance, althoug
 hosting a dockerised image with the Spring Boot application usually is also accepted as
 a good low-cost option.
 
-## Technology Stack
+## 🔧Technology Stack
 - **Java 21**
 - **Spring Boot 3**
 - **Spring REST API**
@@ -25,13 +25,13 @@ a good low-cost option.
 - **RestAssured** for functional testing
 - **GitHub** for GIT versioning and various automatic code validations like checkstyle
 
-## Prequisites
+## ✅Prequisites
 - IDE like Eclipse or IntelliJ for coding and version management with GIT.
 - Able to run `gradlew build` successfully.
 - Able to run src\main\java\uk\co\frankz\hmcts\dts\Application.java.
 
 
-## API Documentation
+## 📖API Documentation
 Running the Spring Boot application picks up properties in application.yaml, with which settings
 it uses a persistence repository and generates documentation.
 
@@ -49,13 +49,18 @@ it uses a persistence repository and generates documentation.
 | title          | String | Required non-blank field of a Task.                                                                                                                                                                                                          |
 | description    | String | Optional (can be omitted) description of a Task.                                                                                                                                                                                             |
 
-## IDE Project structure
+## 🏠️IDE Project structure
 
 ```
 src/
 ├── main
 │   ├── java/uk
 │   │   ├──co.frankz.hmcts.dts
+│   │   │    └── aws/
+│   │   │        ├── lambda/
+│   │   │        │   └──CreateTaskHandler.java
+│   │   │        │   └──...
+│   │   │        └── DynamoService.java
 │   │   │   ├──dto                                        # Data Transfer Objects
 │   │   │   │  ├── Mapper                                 # Convertor between dto and model
 │   │   │   │  └── TaskDto                                # Task Data Transfer Object
@@ -91,7 +96,20 @@ src/
     └── SampleFunctionalTest.java                         # Test for original HMCTS Demo app
 ```
 
-## Deliverable
+## 🧪 Testing
+The unit test code coverage is close to 100%. Not all Spring features are covered.
+![coverage](img/screenshot-codecover.png)
+
+With Spring and a database repository, you would typical have a Spring test version for Functional tests.
+With our choice of instead of a Spring repository, but Eclipse Store local file system repository,
+we are not worried about integrating or smoke testing connections. The Functional test covers Integration and
+Smoke Tests for development. Integration and Smoke Tests will be useful for production.
+
+
+
+
+
+## 🚀Deliverable
 The deliverable is a Spring Boot application packages in htmcts-dev-test-backend jar file,
 which also contains a resource application.yaml which declares endpoint port 4000.
 
@@ -102,7 +120,7 @@ to handle service requests. Exceptions are wrapped into customised TaskException
 which menat to have more friendly information and not to reveal (for security concerns)
 to much of the underlying framework.
 
-## Creative Effort Experience
+## 🤔Creative Effort Experience
 Initial created TaskTest and model class through a TDD approach, then adding Spring MVC with Eclipse Store.
 Spring typically drives one to use JPA for persistence, but I choose to use Eclipse Store, which might be
 more suitable for small Serverless backend services, which I think this Task backend application likely
@@ -118,10 +136,20 @@ was new to me.
 
 Then focussed on documentation and had to make a change in the sample framework to get my Controller classes
 scanned by Swagger, by setting a property in application.yaml.
-I also added an Eclipse Store property that specifies the directory for the data repository.
+I also added an EclipseStore property that specifies the directory for the data repository.
 
 To illustrate that Eclipse Store offers a wider range of repository types is in this
 [screenshot](img/eclipsestore-targets.png) from the Eclipse Store reference manual.
 
+However, the AWS support that EclipseStore has, does offer support for re-entrant database access, but not
+for distributed locking, as I hoped. So with EclipseSore you can have a lambda with just 1 instance (which can be configured)
+but that defeats the role lambdas play, namely automatically increase/decrease the number of available instances
+depending how many requests there are.
+This also goes for a SpringBoot application. You can only have 1 running, and in case of SpringBoot constantly
+active running, to avoid issues with multiple access on the same database from different instances.
 
+So I will create a DynamoDB solution design, with the database access the bottleneck, so that I can demonstrate
+a Serverless solution.
 
+## ✉ Acknowledgement and Support
+Contact mailto:frankz@iae.nl for support.

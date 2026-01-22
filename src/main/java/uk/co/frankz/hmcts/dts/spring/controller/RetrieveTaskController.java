@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
+import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
 import uk.co.frankz.hmcts.dts.spring.TaskWithId;
@@ -44,7 +45,7 @@ public class RetrieveTaskController {
         @ApiResponse(responseCode = "400", description = "No task matching the provided id.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
-    @GetMapping(value = "/get/{id}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = Action.PATH.GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<TaskDto> getTask(@PathVariable String id) {
 
         TaskWithId stored = service.get(id);
@@ -63,7 +64,7 @@ public class RetrieveTaskController {
         @ApiResponse(responseCode = "400", description = "No tasks.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
-    @GetMapping(value = "/get-all-tasks", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = Action.PATH.GET_ALL, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<TaskDto[]> getAllTasks() {
 
         Stream<TaskWithId> stored = service.getAll();

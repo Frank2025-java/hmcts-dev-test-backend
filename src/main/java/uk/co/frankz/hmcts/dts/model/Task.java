@@ -13,15 +13,16 @@ import static java.util.Objects.requireNonNull;
  * status and due date/time.
  * It is required to be able to modify the status,
  * and tasks are searchable with identifier.
- * The identifier is added by TaskId class, which is an extension
+ * The identifier is added by TaskWithId class, which is an extension
  * of this class, and is dependent on a Spring implementation
  * for generating the id.
  * <br/>
- * The setters in this class, return "this" to allow chaining,
+ * The setters in this class, validate if the value is required,
+ * and return "this" to allow chaining,
  * which makes coding a bit less verbose.
  */
 @Getter
-public class Task {
+public class Task implements ITask {
 
     private String title;
     private String description;
@@ -55,6 +56,7 @@ public class Task {
         this.due = due == null ? null : ISO_DATE_TIME.format(due);
     }
 
+    @Override
     public Task setTitle(String title) {
 
         requireNonNull(title);
@@ -62,35 +64,42 @@ public class Task {
         return this;
     }
 
+    @Override
     public Task setDescription(String description) {
         this.description = description;
         return this;
     }
 
+    @Override
     public Task setDue(LocalDateTime due) {
         requireNonNull(due);
         this.due = due == null ? null : ISO_DATE_TIME.format(due);
         return this;
     }
 
+    @Override
     public Task setStatus(Status status) {
         requireNonNull(status);
         this.status = status.name();
         return this;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public Status getStatus() {
         return Status.valueOf(status);
     }
 
+    @Override
     public LocalDateTime getDue() {
         return LocalDateTime.parse(due, ISO_DATE_TIME);
     }

@@ -18,6 +18,11 @@ java {
   }
 }
 
+tasks.withType(JavaCompile) {
+  // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
+  options.release = 17
+}
+
 sourceSets {
   functionalTest {
     java {
@@ -218,5 +223,5 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-//EclipseStore uses reflection to handle serializing, for which we need to add JVM arguments
-applicationDefaultJvmArgs = ["--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED"]
+////EclipseStore uses reflection to handle serializing, for which we need to add JVM arguments
+//applicationDefaultJvmArgs = ["--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED"]

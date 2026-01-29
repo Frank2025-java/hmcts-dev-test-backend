@@ -11,9 +11,10 @@ dependencies {
   implementation fileTree(dir: '../build/libs', include: '*.jar')
 }
 
-// LambdaBuilder builds for Version 21, whereas github prefers 17
+// Github Autobuilkd error: release version 21 not supported
+// LambdaBuilder builds for Version 17, whereas github Analyse tool runs with 17
 tasks.withType(JavaCompile) {
-  options.release = 21
+  options.release = 17
 }
 
 compileJava.dependsOn ':jar'

@@ -55,7 +55,7 @@ public class LambdaBuilder {
 
         FunctionProps lambdaSpec = FunctionProps
             .builder()
-            .runtime(Runtime.JAVA_21)
+            .runtime(Runtime.JAVA_17)
             .handler(requestHandlerClassName)
             .memorySize(128)
             .timeout(Duration.seconds(10))

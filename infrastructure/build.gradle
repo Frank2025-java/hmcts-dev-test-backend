@@ -11,6 +11,11 @@ dependencies {
   implementation fileTree(dir: '../build/libs', include: '*.jar')
 }
 
+// LambdaBuilder builds for Version 21, whereas github prefers 17
+tasks.withType(JavaCompile) {
+  options.release = 21
+}
+
 compileJava.dependsOn ':jar'
 compileJava.dependsOn ':bootJar'
 

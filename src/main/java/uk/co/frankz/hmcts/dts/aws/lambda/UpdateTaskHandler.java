@@ -1,0 +1,86 @@
+package uk.co.frankz.hmcts.dts.aws.lambda;
+
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.commons.lang3.tuple.Pair;
+import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.dto.TaskDto;
+import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
+import uk.co.frankz.hmcts.dts.service.Action;
+
+import java.util.Map;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+public class UpdateTaskHandler extends BaseTaskHandler
+    implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+
+    @Operation(summary = "Update Status by ID.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Task matching provided id.",
+            content = {@Content(mediaType = APPLICATION_JSON_VALUE)}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "No task matching the provided id, or invalid status.",
+            content = @Content),
+        @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
+    })
+    Pair<String, Integer> update(Map<String, String> pathParams) {
+
+        String id = getId(pathParams);
+        String status = get(pathParams, Action.PARM.STATUS);
+
+        TaskWithId taskWitId = service.update(id, status);
+        String body = json.toJsonString(json.toDto(taskWitId));
+
+        return Pair.of(json.toJsonString(taskWitId), 200);
+    }
+
+    @Operation(summary = "Update Task fields.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Updated Task.",
+            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TaskDto.class))}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "No task matching the id in the provided Task.",
+            content = @Content),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Other exceptions.",
+            content = @Content)
+    })
+    Pair<String, Integer> update(String requestBody) {
+        TaskWithId task = json.toEntity(requestBody);
+        TaskWithId taskWitId = service.update(task);
+        String body = json.toJsonString(json.toDto(taskWitId));
+
+        return Pair.of(json.toJsonString(taskWitId), 200);
+    }
+
+    @Override
+    protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)
+        throws Exception {
+
+        if (action == Action.UPDATE) {
+            return update(requestBody);
+        }
+
+        if (action == Action.UPDATE_STATUS) {
+
+            return update(pathParams);
+        }
+
+        throw new TaskNoMatchException(String.valueOf(action), Action.names(Action.UPDATE, Action.UPDATE_STATUS));
+    }
+
+}

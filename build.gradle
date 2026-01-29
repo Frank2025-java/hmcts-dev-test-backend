@@ -18,6 +18,11 @@ java {
   }
 }
 
+tasks.withType(JavaCompile) {
+  // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
+  options.release = 17
+}
+
 sourceSets {
   functionalTest {
     java {
@@ -142,9 +147,17 @@ repositories {
   maven { url 'https://jitpack.io' }
 }
 
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+  group = rootProject.group
+  version = rootProject.version
+}
+
 ext {
   log4JVersion = "2.25.3"
-  logbackVersion = "1.5.24"
+  logbackVersion = "1.5.25"
 }
 
 ext['snakeyaml.version'] = '2.2'
@@ -162,10 +175,6 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
   implementation group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
-
-  implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
-
-  implementation group: 'software.xdev', name: 'spring-data-eclipse-store', version: '2.5.3'
 
   implementation group: 'io.rest-assured', name: 'rest-assured'
   implementation group: 'org.projectlombok', name: 'lombok'
@@ -214,5 +223,5 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-//EclipseStore uses reflection to handle serializing, for which we need to add JVM arguments
-applicationDefaultJvmArgs = ["--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED"]
+////EclipseStore uses reflection to handle serializing, for which we need to add JVM arguments
+//applicationDefaultJvmArgs = ["--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED"]

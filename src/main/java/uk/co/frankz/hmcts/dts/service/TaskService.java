@@ -113,4 +113,8 @@ public class TaskService<T extends EntityWithId & ITask> {
 
         return update(toBeStored);
     }
+
+    public void healthCheck() {
+        store.healthCheck();
+    }
 }

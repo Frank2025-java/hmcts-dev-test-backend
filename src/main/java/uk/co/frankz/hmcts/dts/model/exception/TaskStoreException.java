@@ -24,4 +24,12 @@ public class TaskStoreException extends TaskException {
     public TaskStoreException(EntityWithId taskWithId, Exception e) {
         this(task(taskWithId), e);
     }
+
+    public TaskStoreException(String message, Exception e) {
+        super(message, e);
+    }
+
+    public TaskStoreException(String message) {
+        super(message);
+    }
 }

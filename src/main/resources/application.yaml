@@ -17,8 +17,14 @@ management:
       exposure:
         include: info # should we have more?
 
+# If enabled, generated on the fly API Documentation and Swagger UI.
+# Then use a browser with url http://localhost:4000/v3/api-docs for example.
+# Swagger is available on http://localhost:4000/swagger-ui.html
 springdoc:
-  packagesToScan: uk.gov.hmcts.reform.dev.controllers
+  api-docs:
+    enabled: true # for security concerns this should be set to false
+  packagesToScan: uk.co.frankz.hmcts.dts.spring.controller
+  #packagesToScan: uk.gov.hmcts.reform.dev.controllers
   writer-with-order-by-keys: true
 
 spring:
@@ -26,6 +32,7 @@ spring:
     import: "optional:configtree:/mnt/secrets/test/"
   application:
     name: Dev Test
+
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
@@ -47,3 +54,13 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+#
+# Eclipse Store as a data repository
+# See https://github.com/xdev-software/spring-data-eclipse-store how to configure Cloud targets like AWS s3
+# See also https://docs.eclipsestore.io/manual/storage/configuration/properties.html
+# The local file system is the default setting
+org:
+  eclipse:
+    store:
+      storage-directory: eclipse-storage-task
+

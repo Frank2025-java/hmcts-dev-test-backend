@@ -1,0 +1,38 @@
+plugins {
+  id 'java-library'
+  id 'application'
+  alias(libs.plugins.shadow)
+}
+
+dependencies {
+  implementation libs.aws.cdk
+  implementation libs.constructs
+
+  implementation fileTree(dir: '../build/libs', include: '*.jar')
+}
+
+// Github Autobuilkd error: release version 21 not supported
+// LambdaBuilder builds for Version 17, whereas github Analyse tool runs with 17
+tasks.withType(JavaCompile) {
+  options.release = 17
+}
+
+compileJava.dependsOn ':jar'
+compileJava.dependsOn ':bootJar'
+
+
+application {
+  mainClassName = 'uk.co.frankz.hmcts.dts.aws.infra.CloudAssemblerApplication'
+}
+
+shadowJar {
+  destinationDirectory = file("../assets")
+  archiveVersion = ""
+  archiveClassifier = ""
+
+  manifest {
+    attributes("Implementation-Title": group,
+      "Implementation-Version": version,
+      "Main-Class": mainClassName)
+  }
+}

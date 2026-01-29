@@ -18,6 +18,11 @@ java {
   }
 }
 
+tasks.withType(JavaCompile) {
+  // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
+  options.release = 17
+}
+
 sourceSets {
   functionalTest {
     java {
@@ -142,6 +147,14 @@ repositories {
   maven { url 'https://jitpack.io' }
 }
 
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+  group = rootProject.group
+  version = rootProject.version
+}
+
 ext {
   log4JVersion = "2.25.3"
   logbackVersion = "1.5.26"
@@ -167,6 +180,13 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
+  implementation libs.commons.collection4
+  implementation libs.eclipse.store.spring
+  implementation libs.aws.lambda.core
+  implementation libs.aws.lambda.events
+  implementation libs.aws.dynamobb
+  implementation libs.aws.dynamobb.enh
+
   testImplementation(platform('org.junit:junit-bom:6.0.2'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -175,7 +195,8 @@ dependencies {
   }
 }
 
-mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+//mainClassName = 'uk.gov.hmcts.reform.dev.Application'
+mainClassName = 'uk.co.frankz.hmcts.dts.spring.Application'
 
 bootJar {
   archiveFileName = "test-backend.jar"

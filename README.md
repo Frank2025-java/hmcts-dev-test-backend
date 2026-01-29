@@ -24,12 +24,20 @@ a good low-cost option.
 - **JUnit 5 with Mockito** for testing
 - **RestAssured** for functional testing
 - **GitHub** for GIT versioning and various automatic code validations like checkstyle
+- **CDK v2** AWS Cloud development kit to generate Cloud infrastructure from executing (java) sources.
+- **Lambda** AWS Serverless, which is code that is running on provisioned, scaled, patched AWS infrastructure.
 
-## ✅Prequisites
+## ✅Prerequisites
 - IDE like Eclipse or IntelliJ for coding and version management with GIT.
 - Able to run `gradlew build` successfully.
 - Able to run src\main\java\uk\co\frankz\hmcts\dts\Application.java.
 
+### AWS prerequisites
+- Registered domain name
+- Certificate
+- installed [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html)
+- installed [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- configured profile for [AWS SSO](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html)
 
 ## 📖API Documentation
 Running the Spring Boot application picks up properties in application.yaml, with which settings
@@ -96,6 +104,7 @@ src/
     └── SampleFunctionalTest.java                         # Test for original HMCTS Demo app
 ```
 
+
 ## 🧪 Testing
 The unit test code coverage is close to 100%. Not all Spring features are covered.
 ![coverage](img/screenshot-codecover.png)
@@ -104,8 +113,6 @@ With Spring and a database repository, you would typical have a Spring test vers
 With our choice of instead of a Spring repository, but Eclipse Store local file system repository,
 we are not worried about integrating or smoke testing connections. The Functional test covers Integration and
 Smoke Tests for development. Integration and Smoke Tests will be useful for production.
-
-
 
 
 
@@ -120,6 +127,20 @@ to handle service requests. Exceptions are wrapped into customised TaskException
 which menat to have more friendly information and not to reveal (for security concerns)
 to much of the underlying framework.
 
+## 🖧️Infrastructure
+Often a Spring Boot back-end is provided as a Docker image, that can be uploaded into the
+cloud. Typically some tools are used to change the properties for that image, so that you can
+have images for different environments, different customers, or environment with different databases.
+Those tools are beyond my knowledge, and cannot provide them here.
+
+However, I can provide an infrastructure for lambdas, for which one needs the [](### AWS prerequisites)
+
+### AWS Infrastructure
+
+![AWS archictecture diagram](img\AWS archictecture.png)
+
+
+
 ## 🤔Creative Effort Experience
 Initial created TaskTest and model class through a TDD approach, then adding Spring MVC with Eclipse Store.
 Spring typically drives one to use JPA for persistence, but I choose to use Eclipse Store, which might be
@@ -128,7 +149,7 @@ would be.
 
 ![JPA versus Eclipse Store](img/jpa_vs_eclipsestore.webp)
 
-That proofed to be a learning curve, especially with testing and combination with Spring Boot.
+That proved to be a learning curve, especially with testing and combination with Spring Boot.
 With the Spring annotations and persistence requirements for Eclipse Store framework, the TDD approach
 changed to Behavioural Driven Tests and a separation of types with Spring annotations in a package.
 I have added a "life cycle" (Create, Retrieve, Update, Delete) functional test, using RestAssured, which
@@ -141,15 +162,27 @@ I also added an EclipseStore property that specifies the directory for the data 
 To illustrate that Eclipse Store offers a wider range of repository types is in this
 [screenshot](img/eclipsestore-targets.png) from the Eclipse Store reference manual.
 
-However, the AWS support that EclipseStore has, does offer support for re-entrant database access, but not
-for distributed locking, as I hoped. So with EclipseSore you can have a lambda with just 1 instance (which can be configured)
-but that defeats the role lambdas play, namely automatically increase/decrease the number of available instances
-depending how many requests there are.
+However, the AWS support that EclipseStore has, does allow re-entrant database access, but not
+distributed locking, as I hoped. So with EclipseSore you can have a lambda with just 1 instance
+(which can be configured) but that defeats the role lambdas play, namely automatically increase/decrease
+the number of available instances, depending how many requests there are.
 This also goes for a SpringBoot application. You can only have 1 running, and in case of SpringBoot constantly
 active running, to avoid issues with multiple access on the same database from different instances.
 
 So I will create a DynamoDB solution design, with the database access the bottleneck, so that I can demonstrate
 a Serverless solution.
+
+AWS Lambda is a technology preferred over Spring Boot, because it is (also event driven) code
+which is running on provisioned, scaled, patched AWS infrastructure, and the cost is only the milliseconds
+of the execution and the size of runtime framework. It integrates with a Gateway API for security
+and DynamoDB as a distributed database, i.e. allows multiple back-end instances using the database
+performant and reliable.
+
+To get the AWS architectural diagram, I used Microsoft CoPilot to generate it from the question
+_Give me an AWS architectural diagram of route53, apigateway, 5 lambdas, and a dynamodb table. The lambdas in
+the diagram are labelled respectively "Root", "Create", "Delete", "Retrieve" and "Update". All lambdas, except
+the lambda labelled "Root", connect to the table._.
+
 
 ## ✉ Acknowledgement and Support
 Contact mailto:frankz@iae.nl for support.

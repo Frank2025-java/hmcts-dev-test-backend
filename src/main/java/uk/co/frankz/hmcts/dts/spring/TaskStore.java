@@ -34,4 +34,14 @@ public interface TaskStore
 
     @Override
     Iterable<TaskWithId> findAll();
+
+    /**
+     * The implementation of checking the
+     * health is done from {@link TaskService#healthCheck()}
+     * so that this Spring Beans and the {@link RepositoryHeathIndicator}
+     * are dependent on construction order.
+     */
+    @Override
+    default void healthCheck() {
+    }
 }

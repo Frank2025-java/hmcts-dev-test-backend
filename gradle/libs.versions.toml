@@ -2,6 +2,7 @@
 awssdk = "2.25.0"
 
 [plugins]
+shadow = { id = "com.gradleup.shadow", version = "9.0.0-rc2" }
 
 [bundles]
 
@@ -14,4 +15,7 @@ aws-lambda-core         = { group = "com.amazonaws", name = "aws-lambda-java-cor
 aws-lambda-events       = { group = "com.amazonaws", name = "aws-lambda-java-events", version = "3.16.1" }
 aws-dynamobb            = { group = "software.amazon.awssdk", name = "dynamodb", version.ref = "awssdk" }
 aws-dynamobb-enh        = { group = "software.amazon.awssdk", name = "dynamodb-enhanced", version.ref = "awssdk" }
+
+aws-cdk                 = { group = "software.amazon.awscdk", name = "aws-cdk-lib", version = "2.235.1" }
+constructs              = { group = "software.constructs", name = "constructs", version = "[10.0.0,11.0.0)" }
 

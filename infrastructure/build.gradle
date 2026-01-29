@@ -1,0 +1,32 @@
+plugins {
+  id 'java-library'
+  id 'application'
+  alias(libs.plugins.shadow)
+}
+
+dependencies {
+  implementation libs.aws.cdk
+  implementation libs.constructs
+
+  implementation fileTree(dir: '../build/libs', include: '*.jar')
+}
+
+compileJava.dependsOn ':jar'
+compileJava.dependsOn ':bootJar'
+
+
+application {
+  mainClassName = 'uk.co.frankz.hmcts.dts.aws.infra.CloudAssemblerApplication'
+}
+
+shadowJar {
+  destinationDirectory = file("../assets")
+  archiveVersion = ""
+  archiveClassifier = ""
+
+  manifest {
+    attributes("Implementation-Title": group,
+      "Implementation-Version": version,
+      "Main-Class": mainClassName)
+  }
+}

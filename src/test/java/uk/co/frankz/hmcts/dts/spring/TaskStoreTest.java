@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(
-    properties = {"spring.main.allow-bean-definition-overriding=true",
-        "org.eclipse.store.storage-directory=eclipse-store-storage-test",
-        "org.eclipse.store.channel-count=2"
+    properties = {
+        "spring.main.allow-bean-definition-overriding=true",
+        "org.eclipse.store.storage-directory=build/eclipse-store-storage/taskstoretest"
     },
     classes = Application.class)
 class TaskStoreTest {
@@ -177,4 +177,8 @@ class TaskStoreTest {
         assertFalse(actualIterator.hasNext());
     }
 
+    @Test
+    void shouldNotErrorOnCheckHealth() {
+        testSubject.healthCheck();
+    }
 }

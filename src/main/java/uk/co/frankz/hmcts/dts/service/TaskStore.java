@@ -20,4 +20,6 @@ public interface TaskStore<T extends EntityWithId> {
     void deleteById(String s);
 
     Iterable<T> findAll();
+
+    void healthCheck();
 }

@@ -17,14 +17,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RepositoryHeathIndicatorTest {
 
-    RepositoryHeathIndicator testSubject;
+    RepositoryHealthIndicator testSubject;
 
     @Mock
     TaskStore mockStore;
 
     @BeforeEach
     void setup() {
-        testSubject = new RepositoryHeathIndicator(mockStore);
+        testSubject = new RepositoryHealthIndicator(mockStore);
     }
 
     @Test
@@ -54,7 +54,7 @@ class RepositoryHeathIndicatorTest {
         verify(mockStore).count();
         assertNotNull(actual);
         assertSame(Status.DOWN, actual.getStatus());
-        String actualAsString = RepositoryHeathIndicator.print(actual);
+        String actualAsString = RepositoryHealthIndicator.print(actual);
         assertTrue(actualAsString.contains(givenMessage), actualAsString);
     }
 

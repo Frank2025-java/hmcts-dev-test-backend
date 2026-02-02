@@ -6,6 +6,7 @@ import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.DELETE;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.GET;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.POST;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.PUT;
+import static uk.co.frankz.hmcts.dts.aws.TaskProperties.TABLE;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.DOMAIN;
 
 public interface BackEndComponent {
@@ -52,4 +53,6 @@ public interface BackEndComponent {
 
     SubDomainBuilder apiDomainBuilder = new SubDomainBuilder();
     DnsEntryBuilder dnsEntryBuilder = new DnsEntryBuilder(DOMAIN);
+
+    TableBuilder tableBuilder = new TableBuilder(TABLE);
 }

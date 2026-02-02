@@ -29,6 +29,7 @@ shadowJar {
   destinationDirectory = file("../assets")
   archiveVersion = ""
   archiveClassifier = ""
+  archiveFileName = "infrastructure.jar"
 
   manifest {
     attributes("Implementation-Title": group,

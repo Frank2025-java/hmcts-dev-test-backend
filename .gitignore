@@ -23,18 +23,6 @@ bin/main/application.yaml
 
 applicationinsights-agent-*.jar
 *.log
-/eclipse-store-storage-test/
-/eclipse-storage-task/
-/assets/infrastructure.jar
-/infrastructure/build/distributions/infrastructure-0.0.1.tar
-/infrastructure/build/distributions/infrastructure-0.0.1.zip
-/infrastructure/build/distributions/infrastructure-shadow-0.0.1.tar
-/infrastructure/build/distributions/infrastructure-shadow-0.0.1.zip
-/infrastructure/build/libs/infrastructure-0.0.1.jar
-/infrastructure/build/scripts/infrastructure
-/infrastructure/build/scripts/infrastructure.bat
-/infrastructure/build/scriptsShadow/infrastructure
-/infrastructure/build/scriptsShadow/infrastructure.bat
-/infrastructure/build/tmp/compileJava/previous-compilation-data.bin
-/infrastructure/build/tmp/jar/MANIFEST.MF
-/infrastructure/build/tmp/shadowJar/MANIFEST.MF
+/infrastructure/build
+/assets/*.jar
+/eclipse-storage-*

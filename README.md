@@ -36,6 +36,7 @@ a good low-cost option.
 - Registered domain name
 - Certificate
 - installed [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html)
+- installed Node.js
 - installed [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - configured profile for [AWS SSO](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html)
 
@@ -60,48 +61,109 @@ it uses a persistence repository and generates documentation.
 ## 🏠️IDE Project structure
 
 ```
-src/
-├── main
-│   ├── java/uk
-│   │   ├──co.frankz.hmcts.dts
-│   │   │    └── aws/
-│   │   │        ├── lambda/
-│   │   │        │   └──CreateTaskHandler.java
-│   │   │        │   └──...
-│   │   │        └── DynamoService.java
-│   │   │   ├──dto                                        # Data Transfer Objects
-│   │   │   │  ├── Mapper                                 # Convertor between dto and model
-│   │   │   │  └── TaskDto                                # Task Data Transfer Object
-│   │   │   ├──model                                      # Application entities
-│   │   │   │  ├──exception                               # Application exceptions
-│   │   │   │  │  ├── TaskException.java                  # Generic app illegal argument exception
-│   │   │   │  │  ├── TaskInvalidArgumentException.java   # Specific app argument exception
-│   │   │   │  │  ├── TaskNotFoundException.java          # Specific app exception for task not found
-│   │   │   │  │  └── TaskStoreException.java             # Wrapping persistence exception
-│   │   │   │  ├── Status.java                            # Enum for status of a Task
-│   │   │   │  └── Task.java                              # Model representing entity of a Task
-│   │   │   └──spring                                     # Implementation with Spring annotations
-│   │   │      ├──controller                              # Spring Controllers
-│   │   │      │  ├── CreateTaskController.java
-│   │   │      │  ├── DeleteTaskController.java
-│   │   │      │  └── ...
-│   │   │      ├── Application.java                       # Runnable Spring Boot application class
-│   │   │      ├── Mapper.java                            # Convertor between dto and entity and id (managed by Spring)
-│   │   │      ├── TaskExceptionHandler.java              # Spring Controller Exception
-│   │   │      ├──TaskService.java                        # CRUD logic for task with id (managed by spring)
-│   │   │      ├──TaskStore.java                          # CRUD implementation Spring adaptor for Eclipse Store
-│   │   │      ├──TaskStoreEclipseStoreConfig.java        # Configuration Spring adaptor for Eclipse Store
-│   │   │      └──TaskWithId.java                         # Task class representing entity with id managed by Spring
-│   │   │
-│   │   └──gov/hmcts/reform/dev                           # Original HMCTS Demo application
-│   └──resources
-│      └──application.yaml                                # Spring Boot properties, shared with HMCTS Demo
-│
-├── test                                                  # Unit tests
-├── integrationTest                                       # Integration tests with Health check of running app
-└── functionalTest                                        # Functional tests
-    ├── CrudTaskFunctionalTest.java                       # Test to Create, Retrieve, Update and Delete over REST
-    └── SampleFunctionalTest.java                         # Test for original HMCTS Demo app
+hmcts-dev-test-backend/
+    ├── img/                                                  # pictures for read.me
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/
+    │   │   │   └── uk/
+    │   │   │       ├── co/frankz/hmcts/dts/
+    │   │   │       │    ├── aws/                              # AWS specific implementation
+    │   │   │       │    │   ├── lambda/                       # AWS Serverless functions similar as Spring ctrl
+    │   │   │       │    │   │   ├── Header.java
+    │   │   │       │    │   │   ├── BaseTaskHandler.java
+    │   │   │       │    │   │   ├── RootTaskHandler.java
+    │   │   │       │    │   │   ├── CreateTaskHandler.java
+    │   │   │       │    │   │   ├── DeleteTaskHandler.java
+    │   │   │       │    │   │   ├── UpdateTaskHandler.java
+    │   │   │       │    │   │   └── RetrieveTaskHandler.java
+    │   │   │       │    │   ├── dynamodb/                     # AWS DynamoDb database specifics
+    │   │   │       │    │   │   ├── TaskWithId.java           # Entity with annotation generating id
+    │   │   │       │    │   │   └── TaskStoreImpl.java        # CRUD implementation for DynamoDb
+    │   │   │       │    │   ├── Mapper.java                   # Convertor between Dto and Entity with id
+    │   │   │       │    │   ├── TaskService.java              # CRUD logic for task with id for DynamoDb
+    │   │   │       │    │   ├── TaskProperties.java           # Constants for AWS implementation
+    │   │   │       │    │   └── TaskExceptionHandler.java     # Logic for exception displayed to user
+    │   │   │       │    │
+    │   │   │       │    ├── dto/                              # Data Transfer Objects
+    │   │   │       │    │   ├── Mapper.java                   # Convertor between dto and model
+    │   │   │       │    │   └── TaskDto.java                  # Task Data Transfer Object
+    │   │   │       │    ├── model/                            # Application entities
+    │   │   │       │    │   ├── exception/                    # Application exceptions
+    │   │   │       │    │   │   ├── TaskException.java                # base exception for all app exceptions
+    │   │   │       │    │   │   ├── TaskJsonException.java            # app exception for json (de-)serialisation
+    │   │   │       │    │   │   ├── TaskStoreException.java           # app persistence exception
+    │   │   │       │    │   │   ├── TaskNoMatchException.java         # app exception suggesting valid args
+    │   │   │       │    │   │   ├── TaskNotFoundException.java        # App invalid identifier exception
+    │   │   │       │    │   │   └── TaskInvalidArgumentException.java # App illegal argument exception
+    │   │   │       │    │   ├── Task.java                      # Model representing entity of a Task
+    │   │   │       │    │   ├── ITask.java                     # Interface for task getters and setters
+    │   │   │       │    │   ├── Status.java                    # Enum for status of a Task
+    │   │   │       │    │   └── EntityWithId.java              # Interface generalisation for entity with id
+    │   │   │       │    │
+    │   │   │       │    ├── spring/                            # Implementation with Spring annotations
+    │   │   │       │    │   ├── controller/                    # Spring Controllers for REST API
+    │   │   │       │    │   │   ├── RootController.java
+    │   │   │       │    │   │   ├── RootTaskController.java
+    │   │   │       │    │   │   ├── CreateTaskController.java
+    │   │   │       │    │   │   ├── DeleteTaskController.java
+    │   │   │       │    │   │   ├── UpdateTaskController.java
+    │   │   │       │    │   │   └── RetrieveTaskController.java
+    │   │   │       │    │   ├── Mapper.java                       # Convertor between dto - entity/id (Spring)
+    │   │   │       │    │   ├── TaskStore.java                    # CRUD impl Spring adaptor for Eclipse Store
+    │   │   │       │    │   ├── TaskWithId.java                   # Task representing entity with id (Spring)
+    │   │   │       │    │   ├── Application.java                  # Runnable Spring Boot application class
+    │   │   │       │    │   ├── TaskService.java                  # CRUD logic for task with id (Spring managed)
+    │   │   │       │    │   ├── TaskExceptionHandler.java         # Spring Controller Exception
+    │   │   │       │    │   ├── RepositoryHeathIndicator.java     # Logic to check whether app should work
+    │   │   │       │    │   └── TaskStoreEclipseStoreConfig.java  # Configuration Spring adaptor for EclipseStore
+    │   │   │       │    │
+    │   │   │       │    └── service/
+    │   │   │       │        ├── Action.java
+    │   │   │       │        ├── TaskStore.java
+    │   │   │       │        └── TaskService.java
+    │   │   │       │
+    │   │   │       └── gov/hmcts/reform/dev/             # Original HMCTS Demo application
+    │   │   └── resources/
+    │   │       └── application.yaml                      # Spring Boot properties, shared with HMCTS Demo
+    │   │
+    │   ├── test/                                         # Unit tests
+    │   ├── smokeTest/
+    │   ├── functionalTest/                               # Functional tests
+    │   │   └── java/
+    │   │       └── uk/
+    │   │           ├── co/frankz/hmcts/dts/
+    │   │           │   └── CrudTaskFunctionalTest.java   # Test to Create, Retrieve, Update and Delete over REST
+    │   │           └── gov/hmcts/reform/dev/
+    │   │               └── SampleFunctionalTest.java     # Test for original HMCTS Demo app
+    │   └── integrationTest/                              # Integration tests with Health check of running app
+    ├── assets/
+    ├── smokeTest/
+    │   └── build/
+    │       └── sonar-resolver
+    ├── functionalTest/
+    │   └── build/
+    │       └── sonar-resolver
+    ├── infrastructure/                                 # Project the produces the Jar for the Assets project
+    │   └── src/
+    │       ├── main/
+    │          ├── java/
+    │             └── uk/co/frankz/hmcts/dts/aws/infra/  # Infrastructure as (java) code for AWS components
+    │                 ├── CloudAssemblerApplication.java # Application to start generating components
+    │                 ├── BackEndStack.java              # Generating all components for the app
+    │                 ├── MyEnvironment.java             # AWS and CDK (local) environment settings
+    │                 ├── BackEndComponent.java          # Component variables that need generating
+    │                 ├── ProvisionedComponent.java      # Component variables of provisioned components
+    │                 ├── LambdaBuilder.java             # Logic to generate a Serverless Function (AWS Lambda)
+    │                 ├── DnsEntryBuilder.java           # Logic to generate a DNS entry (AWS Route53 entry)
+    │                 ├── SubDomainBuilder.java          # Logic to generate a sub domain for API Gateway
+    │                 ├── ApiGatewayBuilder.java         # Logic to generate AWS API Gateway component for REST
+    │                 ├── LambdaRouteBuilder.java        # Logic to generate link API Gateway to Lambda
+    │                 ├── SubDomainCertFinder.java       # Logic to generate code to lookup the certificate
+    │                 └── TableBuilder.java              # Logic to generate a DynamoDb table
+    │
+    └── assets/                                          # Project that works with AWS and CDK CLI commands
+
 ```
 
 
@@ -138,6 +200,49 @@ However, I can provide an infrastructure for lambdas, for which one needs the []
 ### AWS Infrastructure
 
 ![AWS archictecture diagram](img\AWS archictecture.png)
+
+### CDK setup for Java-Gradle
+The prerequisitis instruct to have a working AWS Component Development toolKit.
+
+`cdk --version`
+
+Should show the version of CDK that you have installed.
+
+A _cdk.json_ file tells the CDK Toolkit how to execute your app.
+You generate this once with
+
+`cdk init --language java`
+
+After that, you need to edit _cdk.json_, to replace the maven command by a basic java command.
+Jst change the line to use basic Java to find the CDK application with:
+
+` "app": "java -jar infrastructure.jar -apiLambdaPath functions.jar -targetAccount <your account> -region <your region> -domainName <your domainname>",`
+
+where
+* _infrastructure.jar_   is the executable jar with your CDK application
+* _functions.jar_        is my example of the shadow jar with my lambda
+* _your account_         is your AWS account number
+* _your region_          is something like eu-west-1
+* _your domainname_      is some domain name
+
+The CDK deploy task relies on having Node.js installed.
+The Gradle community has provided a
+[plugin](https://github.com/kiiadi/gradle-cdk-plugin)
+solution to use the Gradle node plugin instead, which I have not tried.
+
+Summary of deploy steps:
+
+### CDK steps
+
+The main _gradle.build_ should contain a task to generate a shadowJar named _functions.jar_, which contain
+the functionality code plus runtime libraries.
+
+1. `gradle shadowJar` to generate jars into the _Assets_ project folder.
+   - _functions.jar_ with the main functionality
+   - _infrastructure.jar_ with infrastructure components
+2. The CDK Synthesise Step, generates Cloud Formation code.
+3. The CDK Deploy Step generates the components inside AWS, so you need to be logged on to AWS.
+  As part of the Deploy Step, CDK will upload _functions.jar_ to populate the Lambda components.
 
 
 

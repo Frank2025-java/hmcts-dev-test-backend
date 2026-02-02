@@ -23,6 +23,7 @@ import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.getRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.retrieveTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootTaskBuilder;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.tableBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateStatusRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateTaskBuilder;
@@ -38,6 +39,8 @@ public class BackEndStack extends Stack {
 
     public BackEndStack(Construct scope, String id, StackProps props) {
         super(scope, id, props);
+
+        tableBuilder.build(this, "MyTable");
 
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");

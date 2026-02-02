@@ -9,7 +9,7 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Service;
 import uk.co.frankz.hmcts.dts.model.exception.TaskStoreException;
 
-import static uk.co.frankz.hmcts.dts.spring.RepositoryHeathIndicator.print;
+import static uk.co.frankz.hmcts.dts.spring.RepositoryHealthIndicator.print;
 
 @Service
 public class TaskService extends uk.co.frankz.hmcts.dts.service.TaskService<TaskWithId> {
@@ -19,7 +19,7 @@ public class TaskService extends uk.co.frankz.hmcts.dts.service.TaskService<Task
     private final HealthIndicator healthChecker;
 
     @Autowired
-    public TaskService(TaskStore taskStore, RepositoryHeathIndicator health) {
+    public TaskService(TaskStore taskStore, RepositoryHealthIndicator health) {
         super(taskStore);
         this.healthChecker = health;
     }

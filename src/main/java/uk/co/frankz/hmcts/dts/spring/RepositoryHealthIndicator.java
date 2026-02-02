@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
  * It is used in {@link TaskService#healthCheck()}.
  */
 @Component
-public class RepositoryHeathIndicator implements HealthIndicator {
+public class RepositoryHealthIndicator implements HealthIndicator {
 
     private final CrudRepository<TaskWithId, String> repository;
 
     @Autowired
-    public RepositoryHeathIndicator(CrudRepository<TaskWithId, String> repository) {
+    public RepositoryHealthIndicator(CrudRepository<TaskWithId, String> repository) {
         this.repository = repository;
     }
 

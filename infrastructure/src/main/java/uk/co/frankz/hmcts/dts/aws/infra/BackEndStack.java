@@ -44,18 +44,18 @@ public class BackEndStack extends Stack {
 
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");
-        Function deleteLambda = deleteTaskBuilder.build(this, "CreateLambda");
-        Function retrieveLambda = retrieveTaskBuilder.build(this, "CreateLambda");
-        Function updateLambda = updateTaskBuilder.build(this, "CreateLambda");
+        Function deleteLambda = deleteTaskBuilder.build(this, "DeleteLambda");
+        Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
+        Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
 
-        AddRoutesOptions root = rootRoute.build(defaultLambda);
+        AddRoutesOptions root = rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1");
         List<AddRoutesOptions> routeOut = Arrays.asList(
-            createRoute.build(createLambda),
-            deleteRoute.build(deleteLambda),
-            getRoute.build(retrieveLambda),
-            getAllRoute.build(retrieveLambda),
-            updateRoute.build(updateLambda),
-            updateStatusRoute.build(updateLambda)
+            createRoute.build(createLambda, "ApiGatewayRouteToLambda2"),
+            deleteRoute.build(deleteLambda, "ApiGatewayRouteToLambda3"),
+            getRoute.build(retrieveLambda, "ApiGatewayRouteToLambda4"),
+            getAllRoute.build(retrieveLambda, "ApiGatewayRouteToLambda5"),
+            updateRoute.build(updateLambda, "ApiGatewayRouteToLambda6"),
+            updateStatusRoute.build(updateLambda, "ApiGatewayRouteToLambda7")
         );
 
         ICertificate cert = certFinder.find(this);

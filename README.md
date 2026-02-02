@@ -259,6 +259,7 @@ the functionality code plus runtime libraries.
 3. The CDK Deploy Step generates the components inside AWS, and an S3 bucket and IAM roles.
    As part of the Deploy Step, CDK will upload _functions.jar_ to populate the Lambda components.
    To prepare for that, you run, once per AWS account/region:
+   - [Check your SSO user](img/AWS Permissions.png)
    - `cdk bootstrap <your account and region >`    For example _aws://123456789012/us-east-1_
    - `cdk deploy`                                  deploy stack to your default AWS account/region
    - `cdk diff`                                    compare deployed stack with current (local) state

@@ -38,7 +38,7 @@ public interface TaskStore
     /**
      * The implementation of checking the
      * health is done from {@link TaskService#healthCheck()}
-     * so that this Spring Beans and the {@link RepositoryHeathIndicator}
+     * so that this Spring Beans and the {@link RepositoryHealthIndicator}
      * are dependent on construction order.
      */
     @Override

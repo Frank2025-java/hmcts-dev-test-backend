@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class TaskServiceTest {
 
     @MockitoBean
-    RepositoryHeathIndicator mockHealthBean;
+    RepositoryHealthIndicator mockHealthBean;
 
     @Autowired
     TaskService testSubject;

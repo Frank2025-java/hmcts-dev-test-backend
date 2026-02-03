@@ -39,7 +39,7 @@ public class LambdaBuilder {
         this.requestHandlerClassName = requestHandlerClassName;
         this.code = Code.fromAsset(pathJarFile);
 
-        // standard during asset building
+        // feedback of code found during asset building
         out.println("Successfully found lambda in Asset \"" + pathJarFile + "\".");
     }
 

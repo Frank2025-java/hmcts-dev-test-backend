@@ -35,9 +35,8 @@ public class LambdaRouteBuilder {
      * @param lambda target for APIGateway.
      * @return
      */
-    public AddRoutesOptions build(Function lambda) {
+    public AddRoutesOptions build(Function lambda, String id) {
 
-        String id = "ApiGatewayRouteToLambda" + lambda.getFunctionName();
         var httpApiIntegrate = new HttpLambdaIntegration(id, lambda, version2);
 
         return AddRoutesOptions

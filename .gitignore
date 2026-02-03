@@ -26,3 +26,4 @@ applicationinsights-agent-*.jar
 /infrastructure/build
 /assets/*.jar
 /eclipse-storage-*
+/assets/*

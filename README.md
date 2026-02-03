@@ -208,13 +208,13 @@ The prerequisitis instruct to have a working AWS Component Development toolKit.
 
 Should show the version of CDK that you have installed.
 
-A _cdk.json_ file tells the CDK Toolkit how to execute your app.
-You generate this once with
+A _cdk.json_ file in _Assets_ project, tells the CDK Toolkit how to execute your app.
+You generate this only once, with
 
-`cdk init --language java`
+Navigate to Assets: `cd .\assets\`  and execute `cdk init --language java`.
 
 After that, you need to edit _cdk.json_, to replace the maven command by a basic java command.
-Jst change the line to use basic Java to find the CDK application with:
+Just change the line to use basic Java to find the CDK application (mvn -e -q compile exec:java) with:
 
 ` "app": "java -jar infrastructure.jar -apiLambdaPath functions.jar -targetAccount <your account> -region <your region> -domainName <your domainname>",`
 
@@ -224,6 +224,12 @@ where
 * _your account_         is your AWS account number
 * _your region_          is something like eu-west-1
 * _your domainname_      is some domain name
+
+Because AWS has build CDK around Maven, and we do a setup for You can delete all a bit to prevent
+it from pushing it up.
+
+`delete .\assets\src`
+
 
 The CDK deploy task relies on having Node.js installed.
 The Gradle community has provided a
@@ -240,9 +246,30 @@ the functionality code plus runtime libraries.
 1. `gradle shadowJar` to generate jars into the _Assets_ project folder.
    - _functions.jar_ with the main functionality
    - _infrastructure.jar_ with infrastructure components
+1. Navigate to the _assets_ directory
+2. Environment variable _CDK_DEFAULT_ACCOUNT_ should get set, automatically, during the session,
+   in the background by CDK using AWS CLI to make a connection. To allow this you need to have
+   an active AWS session:
+   - `aws sso login`
+   - `aws sts get-caller-identity`
+   - `aws configure get region`
 2. The CDK Synthesise Step, generates Cloud Formation code.
-3. The CDK Deploy Step generates the components inside AWS, so you need to be logged on to AWS.
-  As part of the Deploy Step, CDK will upload _functions.jar_ to populate the Lambda components.
+   - `cdk ls`     executes the application, and flushes out errors and missing environment settings.
+   - `cdk synth`  emits the synthesized CloudFormation template
+3. The CDK Deploy Step generates the components inside AWS, and an S3 bucket and IAM roles.
+   As part of the Deploy Step, CDK will upload _functions.jar_ to populate the Lambda components.
+   To prepare for that, you run, once per AWS account/region:
+   - [Check your SSO user](img/AWS Permissions.png)
+   - `cdk bootstrap <your account and region >`    For example _aws://123456789012/us-east-1_
+   - `cdk deploy`                                  deploy stack to your default AWS account/region
+   - `cdk diff`                                    compare deployed stack with current (local) state
+4. To remove the application you can
+   - `cdk destroy`                                 completely remove the app and stacks
+   - Troubleshoot removal:
+     * `aws s3 rm s3://<bucket name> --recursive`   if there is still something remaining in a generated
+     * `aws logs describe-log-groups`               find out names of log groups that have been created
+     * `aws logs delete-log-group --log-group-name /aws/lambda/<your lambda>`
+
 
 
 

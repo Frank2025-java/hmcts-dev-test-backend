@@ -1,5 +1,7 @@
 package uk.co.frankz.hmcts.dts.aws.dynamodb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -79,6 +81,7 @@ public class TaskStoreImpl implements TaskStore<TaskWithId> {
         TableStatus status;
         try {
             DescribeTableEnhancedResponse desc = table.describeTable();
+            healthCheckLog(desc);
             status = desc.table().tableStatus();
         } catch (Exception e) {
             throw new TaskStoreException("HealthCheck", e);
@@ -86,6 +89,19 @@ public class TaskStoreImpl implements TaskStore<TaskWithId> {
 
         if (TableStatus.ACTIVE != status) {
             throw new TaskStoreException("HealthCheck: Expected " + TableStatus.ACTIVE + " but was " + status + ".");
+        }
+    }
+
+    private void healthCheckLog(DescribeTableEnhancedResponse jsonObject) {
+        if (LOG.isDebugEnabled()) {
+            try {
+                LOG.debug(
+                    new ObjectMapper()
+                        .enable(SerializationFeature.INDENT_OUTPUT)
+                        .writeValueAsString(jsonObject));
+            } catch (Exception e) {
+                LOG.warn(e.toString());
+            }
         }
     }
 }

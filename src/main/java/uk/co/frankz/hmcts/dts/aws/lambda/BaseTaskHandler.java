@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
@@ -35,7 +36,9 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
 
         LambdaLogger out = context.getLogger();
 
-        Action action = Action.fromPath(event.getRouteKey());
+        String routePath = takePathFromRoutKey(event.getRouteKey());
+
+        Action action = Action.fromPath(routePath);
 
         Map<String, String> pathParams = event.getPathParameters();
 
@@ -75,6 +78,16 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         }
 
         return id;
+    }
+
+    private @NotNull String takePathFromRoutKey(String routeKey) {
+        if (StringUtils.isBlank(routeKey)) {
+            return "";
+        }
+
+        String[] parts = routeKey.split(" ", 2);
+
+        return parts.length > 1 ? parts[1] : "";
     }
 
 }

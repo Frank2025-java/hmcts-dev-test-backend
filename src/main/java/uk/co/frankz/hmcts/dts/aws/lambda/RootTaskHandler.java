@@ -34,10 +34,10 @@ public class RootTaskHandler extends BaseTaskHandler
         try {
             service.healthCheck();
 
-            // if health then redirect
-            response.setStatusCode(302);
-            response.setBody(body("Redirecting"));
-            response.setHeaders(Header.REDIRECT_SUCCESS);
+            // if health
+            response.setStatusCode(200);
+            response.setBody(body("OK"));
+            response.setHeaders(Header.HTML);
 
         } catch (TaskException e) {
             response.setStatusCode(200);

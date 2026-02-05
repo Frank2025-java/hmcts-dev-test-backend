@@ -2,11 +2,12 @@ package uk.co.frankz.hmcts.dts.aws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.ArrayUtils;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Task;
-import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
 
 /**
@@ -19,7 +20,27 @@ import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
  */
 public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
 
-    private static final ObjectMapper json = new ObjectMapper();
+    public final static ObjectMapper JACKSON = new ObjectMapper();
+    static {
+        JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
+        JACKSON.registerModule(new JavaTimeModule());
+        JACKSON.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        JACKSON.enable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE);
+    }
+
+    private final ObjectMapper json;
+
+    public Mapper() {
+        this(JACKSON);
+    }
+
+    /**
+     * Constructor to enable unit testing
+     * @param json
+     */
+    Mapper(ObjectMapper json) {
+        this.json = json;
+    }
 
     @Override
     protected Task newEntityWitId(String id) {
@@ -65,11 +86,7 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
     @Override
     public TaskWithId toEntity(TaskDto dto) {
 
-        try {
-            return (TaskWithId) super.toEntity(dto);
-        } catch (Exception e) {
-            throw new TaskInvalidArgumentException(dto.toString(), e);
-        }
+        return (TaskWithId) super.toEntity(dto);
     }
 
     /**

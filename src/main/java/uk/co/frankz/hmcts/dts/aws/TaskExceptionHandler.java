@@ -1,8 +1,8 @@
 package uk.co.frankz.hmcts.dts.aws;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
-import uk.co.frankz.hmcts.dts.aws.lambda.Header;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
+import uk.co.frankz.hmcts.dts.service.Header;
 
 public class TaskExceptionHandler {
 

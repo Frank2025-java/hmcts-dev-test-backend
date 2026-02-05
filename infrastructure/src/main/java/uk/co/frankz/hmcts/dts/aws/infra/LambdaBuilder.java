@@ -25,9 +25,6 @@ public class LambdaBuilder {
     private final static Map<String, String> envVariables = Map.of(
         "LOG_LEVEL", "DEBUG"
         , "ROOT_LOGGING_LEVEL", "DEBUG"
-        , "JACKSON_PRETTY_PRINT", "true"
-        , "JACKSON_INCLUDE_NON_NULL", "true"
-        , "JACKSON_DATE_FORMAT", "yyyy-MM-dd'T'HH:mm:ss.SSS"
     );
 
     /**

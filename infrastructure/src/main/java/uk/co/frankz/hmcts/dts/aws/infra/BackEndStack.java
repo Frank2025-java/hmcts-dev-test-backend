@@ -6,6 +6,7 @@ import software.amazon.awscdk.services.apigatewayv2.AddRoutesOptions;
 import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.apigatewayv2.HttpApi;
 import software.amazon.awscdk.services.certificatemanager.ICertificate;
+import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Function;
 import software.constructs.Construct;
 
@@ -42,13 +43,19 @@ public class BackEndStack extends Stack {
     public BackEndStack(Construct scope, String id, StackProps props) {
         super(scope, id, props);
 
-        tableBuilder.build(this, "MyTable");
+        Table table = tableBuilder.build(this, "MyTable");
 
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");
         Function deleteLambda = deleteTaskBuilder.build(this, "DeleteLambda");
         Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
         Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
+
+        table.grant(defaultLambda, "dynamodb:DescribeTable");
+        table.grant(createLambda, "dynamodb:PutItem");
+        table.grant(deleteLambda, "dynamodb:DeleteItem");
+        table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
+        table.grant(updateLambda, "dynamodb:UpdateItem");
 
         AddRoutesOptions root = rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1");
         List<AddRoutesOptions> routeOut = Arrays.asList(

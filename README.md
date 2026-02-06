@@ -12,6 +12,7 @@ hosting a dockerised image with the Spring Boot application usually is also acce
 a good low-cost option.
 
 ## 🔧Technology Stack
+- **IntelliJ** IntelliJ IDEA 2025 (Community Edition)
 - **Java 21**
 - **Spring Boot 3**
 - **Spring REST API**
@@ -26,6 +27,7 @@ a good low-cost option.
 - **GitHub** for GIT versioning and various automatic code validations like checkstyle
 - **CDK v2** AWS Cloud development kit to generate Cloud infrastructure from executing (java) sources.
 - **Lambda** AWS Serverless, which is code that is running on provisioned, scaled, patched AWS infrastructure.
+- **CoPilot** AI Generative tool
 
 ## ✅Prerequisites
 - IDE like Eclipse or IntelliJ for coding and version management with GIT.
@@ -197,11 +199,11 @@ have images for different environments, different customers, or environment with
 Those tools are beyond my knowledge, and cannot provide them here.
 
 I can provide an infrastructure for lambdas as code, and versioned, which I do in project _infrastructure_.
-To deploy that, you need the AWS prerequisites mentioned here [above](#-AWS-prerequisites).
+To deploy that, you need the AWS prerequisites mentioned here [above](#AWS-prerequisites).
 
 ### AWS Infrastructure
 
-![AWS archictecture diagram](img/AWS_archictecture.png)
+![AWS architecture diagram](img/AWS_architecture.png)
 
 ### CDK setup for Java-Gradle
 The prerequisitis instruct to have a working AWS Component Development toolKit.

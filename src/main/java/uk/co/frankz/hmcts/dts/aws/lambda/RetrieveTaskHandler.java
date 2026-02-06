@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -21,6 +23,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class RetrieveTaskHandler extends BaseTaskHandler
     implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+
+    /**
+     * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
+     */
+    public RetrieveTaskHandler() {
+        super();
+    }
+
+    /**
+     * Constructor allowing unit test with mocks.
+     *
+     * @param service allows unit testing with mock TaskService
+     * @param json    allows unit testing with mock Mapper
+     */
+    RetrieveTaskHandler(TaskService<TaskWithId> service, Mapper json) {
+        super(service, json);
+    }
 
     @Override
     protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)

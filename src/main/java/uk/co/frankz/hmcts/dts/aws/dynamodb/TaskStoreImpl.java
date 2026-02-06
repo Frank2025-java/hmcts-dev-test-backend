@@ -42,14 +42,19 @@ public class TaskStoreImpl implements TaskStore<TaskWithId> {
 
     public <S extends TaskWithId> S save(S entity) {
 
-        if (entity.isNew()) {
+        try {
+            if (entity.isNew()) {
 
-            // UUID is generated during putItem()
-            table.putItem(entity);
+                // UUID is generated during putItem()
+                table.putItem(entity);
 
-            LOG.info("After putItem the id is generated: " + entity);
-        } else {
-            table.updateItem(entity);
+                LOG.info("After putItem the id is generated: " + entity);
+            } else {
+                table.updateItem(entity);
+            }
+        } catch (Exception e) {
+            LOG.error("Save failed: ", e);
+            throw new TaskStoreException(e);
         }
 
         return entity;
@@ -81,7 +86,12 @@ public class TaskStoreImpl implements TaskStore<TaskWithId> {
 
     public Iterable<TaskWithId> findAll() {
 
-        return table.scan().items().stream().toList();
+        try {
+            return table.scan().items().stream().toList();
+        } catch (Exception e) {
+            LOG.error("Scan failed: ", e);
+            throw new TaskStoreException(e);
+        }
     }
 
     public void healthCheck() {

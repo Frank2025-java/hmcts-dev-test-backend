@@ -196,11 +196,12 @@ cloud. Typically some tools are used to change the properties for that image, so
 have images for different environments, different customers, or environment with different databases.
 Those tools are beyond my knowledge, and cannot provide them here.
 
-However, I can provide an infrastructure for lambdas, for which one needs the [](### AWS prerequisites)
+I can provide an infrastructure for lambdas as code, and versioned, which I do in project _infrastructure_.
+To deploy that, you need the AWS prerequisites mentioned here [above](#-AWS-prerequisites).
 
 ### AWS Infrastructure
 
-![AWS architecture diagram](img/AWS architecture.png)
+![AWS archictecture diagram](img/AWS_archictecture.png)
 
 ### CDK setup for Java-Gradle
 The prerequisitis instruct to have a working AWS Component Development toolKit.
@@ -268,6 +269,8 @@ the functionality code plus runtime libraries.
      * `aws s3 rm s3://<bucket name> --recursive`   if there is still something remaining in a generated
      * `aws logs describe-log-groups`               find out names of log groups that have been created
      * `aws logs delete-log-group --log-group-name /aws/lambda/<your lambda>`
+
+
 
 
 ## 🤔Creative Effort Experience

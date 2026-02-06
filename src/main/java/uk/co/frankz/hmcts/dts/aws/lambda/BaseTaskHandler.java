@@ -6,11 +6,15 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.Header;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
@@ -26,22 +30,41 @@ import static uk.co.frankz.hmcts.dts.aws.TaskExceptionHandler.setErrorOnResponse
  */
 abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
-    protected final TaskService<TaskWithId> service = new uk.co.frankz.hmcts.dts.aws.TaskService();
+    protected final TaskService<TaskWithId> service;
+    protected final Mapper json;
 
-    protected final Mapper json = new Mapper();
+    /**
+     * Warm container contructor. Should run on container start, but not on each invocation.
+     */
+    protected BaseTaskHandler() {
+        this(new uk.co.frankz.hmcts.dts.aws.TaskService(DefaultCredentialsProvider.create()), new Mapper());
+    }
+
+    /**
+     * Constructor allowing unit test with mocks.
+     *
+     * @param service access to the database
+     * @param json    the conversion for DTOs and Jackson json mapper
+     */
+    protected BaseTaskHandler(TaskService<TaskWithId> service, Mapper json) {
+        this.service = service;
+        this.json = json;
+    }
 
     @Override
     public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent event, Context context) {
 
         LambdaLogger out = context.getLogger();
 
-        Action action = Action.fromPath(event.getRouteKey());
-
-        Map<String, String> pathParams = event.getPathParameters();
-
         var response = new APIGatewayV2HTTPResponse();
 
         try {
+            String routePath = takePathFromRoutKey(event.getRouteKey());
+
+            Action action = Action.fromPath(routePath);
+
+            Map<String, String> pathParams = event.getPathParameters();
+
             Pair<String, Integer> result = handle(action, event.getBody(), pathParams);
 
             response.setStatusCode(result.getRight());
@@ -49,9 +72,12 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
             response.setHeaders(Header.JSON);
 
         } catch (Exception e) {
-            out.log(e.getMessage());
+            out.log(TaskException.toString(e));
             setErrorOnResponse(e, response);
         }
+
+        out.log("Response: " + response.getBody());
+
         return response;
     }
 
@@ -75,6 +101,20 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         }
 
         return id;
+    }
+
+    private @NotNull String takePathFromRoutKey(String routeKey) {
+        if (StringUtils.isBlank(routeKey)) {
+            return "";
+        }
+
+        if ("$Default".equals(routeKey)) {
+            return Action.PATH.ROOT;
+        }
+
+        String[] parts = routeKey.split(" ", 2);
+
+        return parts.length > 1 ? parts[1] : "";
     }
 
 }

@@ -1,5 +1,6 @@
 package uk.co.frankz.hmcts.dts.aws.infra;
 
+import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.route53.ARecord;
 import software.amazon.awscdk.services.route53.HostedZone;
 import software.amazon.awscdk.services.route53.HostedZoneProviderProps;
@@ -7,7 +8,6 @@ import software.amazon.awscdk.services.route53.IHostedZone;
 import software.amazon.awscdk.services.route53.RecordTarget;
 import software.amazon.awscdk.services.route53.targets.ApiGatewayv2DomainProperties;
 import software.constructs.Construct;
-import uk.co.frankz.hmcts.dts.aws.infra.SubDomainBuilder.SubDomain;
 
 /**
  * Utility class to generate CDK constructs to do with Route53.
@@ -45,13 +45,16 @@ public class DnsEntryBuilder {
      * @param scope     of construct
      * @param id        as CDK identifier in the generated asset files
      * @param name      of the Route53 entry
-     * @param subDomain wrapping the name and reference to CDK domain construct
+     * @param subDomain reference to CDK created custom subdomain construct
      */
-    public void build(Construct scope, String id, String name, SubDomain subDomain) {
+    public void build(Construct scope, String id, String name, DomainName subDomain) {
 
         var route53Zone = find(scope);
 
-        var gateway = new ApiGatewayv2DomainProperties(subDomain.name(), subDomain.obj().getRegionalHostedZoneId());
+        var gateway = new ApiGatewayv2DomainProperties(
+            subDomain.getRegionalDomainName(),
+            subDomain.getRegionalHostedZoneId()
+        );
 
         ARecord.Builder.create(scope, id)
             .zone(route53Zone)

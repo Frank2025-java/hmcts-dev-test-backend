@@ -5,16 +5,36 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.bind.annotation.GetMapping;
+import uk.co.frankz.hmcts.dts.aws.Mapper;
+import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
 
 public class RootTaskHandler extends BaseTaskHandler
     implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+
+    /**
+     * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
+     */
+    public RootTaskHandler() {
+        super();
+    }
+
+    /**
+     * Constructor allowing unit test with mocks.
+     *
+     * @param service allows unit testing with mock TaskService
+     * @param json    allows unit testing with mock Mapper
+     */
+    RootTaskHandler(TaskService<TaskWithId> service, Mapper json) {
+        super(service, json);
+    }
 
     private static final String BODY_FORMAT = "<!DOCTYPE html><html>"
         + "<head><title>Success</title></head>"
@@ -32,15 +52,15 @@ public class RootTaskHandler extends BaseTaskHandler
         var response = new APIGatewayV2HTTPResponse();
 
         try {
-            service.healthCheck();
+            Pair<String, Integer> result = handle(null, null, null);
 
-            // if health then redirect
-            response.setStatusCode(302);
-            response.setBody(body("Redirecting"));
-            response.setHeaders(Header.REDIRECT_SUCCESS);
+            response.setStatusCode(result.getRight());
+            response.setBody(body(result.getLeft()));
+            response.setHeaders(Header.HTML);
 
-        } catch (TaskException e) {
-            response.setStatusCode(200);
+        } catch (Exception e) {
+
+            response.setStatusCode(500);
             response.setBody(body(e.getMessage()));
             response.setHeaders(Header.HTML);
         }
@@ -51,9 +71,16 @@ public class RootTaskHandler extends BaseTaskHandler
     @Override
     protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)
         throws Exception {
-        // should not come here
-        throw new NotImplementedException(
-            "handleRequest is overridden to allow redirection, so handle is not implemented.");
+
+        try {
+            service.healthCheck();
+
+            // if healthty
+            return Pair.of("OK", 200);
+
+        } catch (TaskException e) {
+            return Pair.of(e.getMessage(), 200);
+        }
     }
 
     private String body(String message) {

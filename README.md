@@ -186,7 +186,7 @@ This is a backend with a running REST API on a port, which consumes and produces
 
 The relies on sufficient logging in the underlying Spring and Eclipse Store frameworks,
 to handle service requests. Exceptions are wrapped into customised TaskExceptions,
-which menat to have more friendly information and not to reveal (for security concerns)
+which is intended to have more friendly information and not to reveal (for security concerns)
 to much of the underlying framework.
 
 ## 🖧️Infrastructure
@@ -199,7 +199,7 @@ However, I can provide an infrastructure for lambdas, for which one needs the []
 
 ### AWS Infrastructure
 
-![AWS archictecture diagram](img\AWS archictecture.png)
+![AWS architecture diagram](img/AWS architecture.png)
 
 ### CDK setup for Java-Gradle
 The prerequisitis instruct to have a working AWS Component Development toolKit.
@@ -209,9 +209,9 @@ The prerequisitis instruct to have a working AWS Component Development toolKit.
 Should show the version of CDK that you have installed.
 
 A _cdk.json_ file in _Assets_ project, tells the CDK Toolkit how to execute your app.
-You generate this only once, with
-
-Navigate to Assets: `cd .\assets\`  and execute `cdk init --language java`.
+You generate this only once, by:
+1. Navigate to Assets: `cd .\assets\`
+2. and execute `cdk init --language java`.
 
 After that, you need to edit _cdk.json_, to replace the maven command by a basic java command.
 Just change the line to use basic Java to find the CDK application (mvn -e -q compile exec:java) with:
@@ -219,16 +219,14 @@ Just change the line to use basic Java to find the CDK application (mvn -e -q co
 ` "app": "java -jar infrastructure.jar -apiLambdaPath functions.jar -targetAccount <your account> -region <your region> -domainName <your domainname>",`
 
 where
-* _infrastructure.jar_   is the executable jar with your CDK application
-* _functions.jar_        is my example of the shadow jar with my lambda
+* _infrastructure.jar_   is the executable shadow jar with our CDK application
+* _functions.jar_        is the shadow jar with our java compiled lambda code
 * _your account_         is your AWS account number
 * _your region_          is something like eu-west-1
-* _your domainname_      is some domain name
+* _your domainname_      is your domain name
 
-Because AWS has build CDK around Maven, and we do a setup for You can delete all a bit to prevent
-it from pushing it up.
-
-`delete .\assets\src`
+Not necessary, but because AWS has build CDK around Maven, and we do a setup for You can delete all a bit to prevent
+it from pushing it up. (`delete ./assets/src`, `delete ./assets/pom.xml`)
 
 
 The CDK deploy task relies on having Node.js installed.
@@ -271,13 +269,11 @@ the functionality code plus runtime libraries.
      * `aws logs delete-log-group --log-group-name /aws/lambda/<your lambda>`
 
 
-
-
 ## 🤔Creative Effort Experience
 Initial created TaskTest and model class through a TDD approach, then adding Spring MVC with Eclipse Store.
 Spring typically drives one to use JPA for persistence, but I choose to use Eclipse Store, which might be
 more suitable for small Serverless backend services, which I think this Task backend application likely
-would be.
+would be. Unfortunately, I learned further down, see below, that it did not live up to that promise.
 
 ![JPA versus Eclipse Store](img/jpa_vs_eclipsestore.webp)
 
@@ -298,13 +294,15 @@ However, the AWS support that EclipseStore has, does allow re-entrant database a
 distributed locking, as I hoped. So with EclipseSore you can have a lambda with just 1 instance
 (which can be configured) but that defeats the role lambdas play, namely automatically increase/decrease
 the number of available instances, depending how many requests there are.
-This also goes for a SpringBoot application. You can only have 1 running, and in case of SpringBoot constantly
+Also the SpringBoot application can only have 1 running, and in case of SpringBoot constantly
 active running, to avoid issues with multiple access on the same database from different instances.
+Unless, and will work, when you explicitly use in our code, locking mechanisms that database providers give,
+like Postgres Advisor.
 
-So I will create a DynamoDB solution design, with the database access the bottleneck, so that I can demonstrate
-a Serverless solution.
+I create a DynamoDB solution design, with the database access the bottleneck, so that I can demonstrate
+a Serverless solution, or a migration strategy to a serverless solution in combination of DynamoDb.
 
-AWS Lambda is a technology preferred over Spring Boot, because it is (also event driven) code
+AWS Lambda might be a technology preferred over Spring Boot, because it is (also event driven) code
 which is running on provisioned, scaled, patched AWS infrastructure, and the cost is only the milliseconds
 of the execution and the size of runtime framework. It integrates with a Gateway API for security
 and DynamoDB as a distributed database, i.e. allows multiple back-end instances using the database
@@ -313,7 +311,10 @@ performant and reliable.
 To get the AWS architectural diagram, I used Microsoft CoPilot to generate it from the question
 _Give me an AWS architectural diagram of route53, apigateway, 5 lambdas, and a dynamodb table. The lambdas in
 the diagram are labelled respectively "Root", "Create", "Delete", "Retrieve" and "Update". All lambdas, except
-the lambda labelled "Root", connect to the table._.
+the lambda labelled "Root", connect to the table._. That image is shown above.
+
+With deploying it, I realised that I have hard-coded my domain name and certificate
+in _ProvisionedComponent.java_, which I do not see an easy way around that.
 
 
 ## ✉ Acknowledgement and Support

@@ -3,8 +3,10 @@ package uk.co.frankz.hmcts.dts.aws.infra;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigatewayv2.AddRoutesOptions;
+import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.apigatewayv2.HttpApi;
 import software.amazon.awscdk.services.certificatemanager.ICertificate;
+import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Function;
 import software.constructs.Construct;
 
@@ -29,6 +31,7 @@ import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateStatusRout
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.MyEnvironment.awsDefaultProfile;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.SUBDOMAIN_NAME;
+import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.SUBDOMAIN_PREFIX;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.certFinder;
 
 public class BackEndStack extends Stack {
@@ -40,13 +43,19 @@ public class BackEndStack extends Stack {
     public BackEndStack(Construct scope, String id, StackProps props) {
         super(scope, id, props);
 
-        tableBuilder.build(this, "MyTable");
+        Table table = tableBuilder.build(this, "MyTable");
 
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");
         Function deleteLambda = deleteTaskBuilder.build(this, "DeleteLambda");
         Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
         Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
+
+        table.grant(defaultLambda, "dynamodb:DescribeTable");
+        table.grant(createLambda, "dynamodb:PutItem");
+        table.grant(deleteLambda, "dynamodb:DeleteItem");
+        table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
+        table.grant(updateLambda, "dynamodb:UpdateItem");
 
         AddRoutesOptions root = rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1");
         List<AddRoutesOptions> routeOut = Arrays.asList(
@@ -59,15 +68,15 @@ public class BackEndStack extends Stack {
         );
 
         ICertificate cert = certFinder.find(this);
-        SubDomainBuilder.SubDomain subDomain = apiDomainBuilder.build(this, "MySubDomain", SUBDOMAIN_NAME, cert);
+        DomainName subDomain = apiDomainBuilder.build(this, "MySubDomain", SUBDOMAIN_NAME, cert);
 
-        HttpApi api = apiBuilder.build(this, "MyApi", subDomain.obj(), root.getIntegration());
-        apiBuilder.buildMap(this, "MyBasePathMap", api, subDomain.obj(), "task");
+        HttpApi api = apiBuilder.build(this, "MyApi", subDomain, root.getIntegration());
+        apiBuilder.buildMap(this, "MyBasePathMap", api, subDomain, "task");
 
         // add all the lambda routes outgoing from apigateway
         routeOut.forEach(api::addRoutes);
 
         // add the incoming route to apigateway
-        dnsEntryBuilder.build(this, "MyAliasDNS", "task", subDomain);
+        dnsEntryBuilder.build(this, "MyAliasDNS", SUBDOMAIN_PREFIX, subDomain);
     }
 }

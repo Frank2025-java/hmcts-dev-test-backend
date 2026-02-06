@@ -24,13 +24,13 @@ public class TableBuilder {
      * @param scope of construct
      * @param id    as CDK identifier in the generated asset files
      */
-    public void build(Construct scope, String id) {
+    public Table build(Construct scope, String id) {
         Attribute keyColumn = Attribute.builder()
             .name("id")
             .type(AttributeType.STRING)
             .build();
 
-        Table.Builder
+        return Table.Builder
             .create(scope, id)
             .tableName(this.name)
             .partitionKey(keyColumn)

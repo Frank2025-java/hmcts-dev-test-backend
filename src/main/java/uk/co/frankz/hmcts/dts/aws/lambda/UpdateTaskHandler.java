@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
 
@@ -20,6 +22,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class UpdateTaskHandler extends BaseTaskHandler
     implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+
+    /**
+     * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
+     */
+    public UpdateTaskHandler() {
+        super();
+    }
+
+    /**
+     * Constructor allowing unit test with mocks.
+     *
+     * @param service allows unit testing with mock TaskService
+     * @param json    allows unit testing with mock Mapper
+     */
+    UpdateTaskHandler(TaskService<TaskWithId> service, Mapper json) {
+        super(service, json);
+    }
 
     @Operation(summary = "Update Status by ID.")
     @ApiResponses(value = {

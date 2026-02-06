@@ -20,7 +20,8 @@ import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
  */
 public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
 
-    public final static ObjectMapper JACKSON = new ObjectMapper();
+    public static final ObjectMapper JACKSON = new ObjectMapper();
+
     static {
         JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
         JACKSON.registerModule(new JavaTimeModule());
@@ -35,8 +36,9 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
     }
 
     /**
-     * Constructor to enable unit testing
-     * @param json
+     * Constructor to allow unit testing with mocks.
+     *
+     * @param json Jackson ObjectMapper instance
      */
     Mapper(ObjectMapper json) {
         this.json = json;

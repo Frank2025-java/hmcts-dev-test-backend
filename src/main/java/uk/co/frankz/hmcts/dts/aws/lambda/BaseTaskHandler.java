@@ -37,10 +37,7 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
      * Warm container contructor. Should run on container start, but not on each invocation.
      */
     protected BaseTaskHandler() {
-        this(
-            new uk.co.frankz.hmcts.dts.aws.TaskService(DefaultCredentialsProvider.create())
-            , new Mapper()
-        );
+        this(new uk.co.frankz.hmcts.dts.aws.TaskService(DefaultCredentialsProvider.create()), new Mapper());
     }
 
     /**

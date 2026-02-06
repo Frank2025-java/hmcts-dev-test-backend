@@ -70,7 +70,6 @@ hmcts-dev-test-backend/
     │   │   │       ├── co/frankz/hmcts/dts/
     │   │   │       │    ├── aws/                              # AWS specific implementation
     │   │   │       │    │   ├── lambda/                       # AWS Serverless functions similar as Spring ctrl
-    │   │   │       │    │   │   ├── Header.java
     │   │   │       │    │   │   ├── BaseTaskHandler.java
     │   │   │       │    │   │   ├── RootTaskHandler.java
     │   │   │       │    │   │   ├── CreateTaskHandler.java
@@ -84,22 +83,6 @@ hmcts-dev-test-backend/
     │   │   │       │    │   ├── TaskService.java              # CRUD logic for task with id for DynamoDb
     │   │   │       │    │   ├── TaskProperties.java           # Constants for AWS implementation
     │   │   │       │    │   └── TaskExceptionHandler.java     # Logic for exception displayed to user
-    │   │   │       │    │
-    │   │   │       │    ├── dto/                              # Data Transfer Objects
-    │   │   │       │    │   ├── Mapper.java                   # Convertor between dto and model
-    │   │   │       │    │   └── TaskDto.java                  # Task Data Transfer Object
-    │   │   │       │    ├── model/                            # Application entities
-    │   │   │       │    │   ├── exception/                    # Application exceptions
-    │   │   │       │    │   │   ├── TaskException.java                # base exception for all app exceptions
-    │   │   │       │    │   │   ├── TaskJsonException.java            # app exception for json (de-)serialisation
-    │   │   │       │    │   │   ├── TaskStoreException.java           # app persistence exception
-    │   │   │       │    │   │   ├── TaskNoMatchException.java         # app exception suggesting valid args
-    │   │   │       │    │   │   ├── TaskNotFoundException.java        # App invalid identifier exception
-    │   │   │       │    │   │   └── TaskInvalidArgumentException.java # App illegal argument exception
-    │   │   │       │    │   ├── Task.java                      # Model representing entity of a Task
-    │   │   │       │    │   ├── ITask.java                     # Interface for task getters and setters
-    │   │   │       │    │   ├── Status.java                    # Enum for status of a Task
-    │   │   │       │    │   └── EntityWithId.java              # Interface generalisation for entity with id
     │   │   │       │    │
     │   │   │       │    ├── spring/                            # Implementation with Spring annotations
     │   │   │       │    │   ├── controller/                    # Spring Controllers for REST API
@@ -118,10 +101,28 @@ hmcts-dev-test-backend/
     │   │   │       │    │   ├── RepositoryHeathIndicator.java     # Logic to check whether app should work
     │   │   │       │    │   └── TaskStoreEclipseStoreConfig.java  # Configuration Spring adaptor for EclipseStore
     │   │   │       │    │
-    │   │   │       │    └── service/
-    │   │   │       │        ├── Action.java
-    │   │   │       │        ├── TaskStore.java
-    │   │   │       │        └── TaskService.java
+    │   │   │       │    ├── dto/                              # Data Transfer Objects
+    │   │   │       │    │   ├── Mapper.java                   # Common convertor between dto and model
+    │   │   │       │    │   └── TaskDto.java                  # Task Data Transfer Object
+    │   │   │       │    │
+    │   │   │       │    ├── model/                            # Application entities
+    │   │   │       │    │   ├── exception/                    # Application exceptions
+    │   │   │       │    │   │   ├── TaskException.java                # base exception for all app exceptions
+    │   │   │       │    │   │   ├── TaskJsonException.java            # app exception for json (de-)serialisation
+    │   │   │       │    │   │   ├── TaskStoreException.java           # app persistence exception
+    │   │   │       │    │   │   ├── TaskNoMatchException.java         # app exception suggesting valid args
+    │   │   │       │    │   │   ├── TaskNotFoundException.java        # App invalid identifier exception
+    │   │   │       │    │   │   └── TaskInvalidArgumentException.java # App illegal argument exception
+    │   │   │       │    │   ├── Task.java                      # Model representing entity of a Task
+    │   │   │       │    │   ├── ITask.java                     # Interface for task getters and setters
+    │   │   │       │    │   ├── Status.java                    # Enum for status of a Task
+    │   │   │       │    │   └── EntityWithId.java              # Interface generalisation for entity with id
+    │   │   │       │    │
+    │   │   │       │    └── service/                          # Common functional code for Lambda and Spring impl
+    │   │   │       │        ├── Header.java                   # Enum for headers in Http
+    │   │   │       │        ├── Action.java                   # Common http paths covered in Lambda and Spring
+    │   │   │       │        ├── TaskStore.java                # Common persistance interface for Lambda and Spring
+    │   │   │       │        └── TaskService.java              # Common service interface for Lambda and Spring
     │   │   │       │
     │   │   │       └── gov/hmcts/reform/dev/             # Original HMCTS Demo application
     │   │   └── resources/

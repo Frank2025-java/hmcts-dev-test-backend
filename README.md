@@ -192,7 +192,7 @@ to much of the underlying framework.
 
 ## 🖧️Infrastructure
 Often a Spring Boot back-end is provided as a Docker image, that can be uploaded into the
-cloud. Typically some tools are used to change the properties for that image, so that you can
+cloud. Typical, some tools are used to change the properties for that image, so that you can
 have images for different environments, different customers, or environment with different databases.
 Those tools are beyond my knowledge, and cannot provide them here.
 

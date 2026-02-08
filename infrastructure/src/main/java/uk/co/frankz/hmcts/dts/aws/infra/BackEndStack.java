@@ -3,11 +3,13 @@ package uk.co.frankz.hmcts.dts.aws.infra;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigatewayv2.AddRoutesOptions;
+import software.amazon.awscdk.services.apigatewayv2.CfnStage;
 import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.apigatewayv2.HttpApi;
 import software.amazon.awscdk.services.certificatemanager.ICertificate;
 import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Function;
+import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 
 import java.util.Arrays;
@@ -15,6 +17,7 @@ import java.util.List;
 
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiDomainBuilder;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiLogBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.createRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.createTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.deleteRoute;
@@ -26,6 +29,8 @@ import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.retrieveTaskBuil
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.tableBuilder;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.testBuilder;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.testRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateStatusRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateTaskBuilder;
@@ -51,14 +56,18 @@ public class BackEndStack extends Stack {
         Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
         Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
 
+        Function testLambda = testBuilder.build(this, "TestLambda");
+        table.grantReadWriteData(testLambda);
+
         table.grant(defaultLambda, "dynamodb:DescribeTable");
         table.grant(createLambda, "dynamodb:PutItem");
         table.grant(deleteLambda, "dynamodb:DeleteItem");
         table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
         table.grant(updateLambda, "dynamodb:UpdateItem");
 
-        AddRoutesOptions root = rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1");
         List<AddRoutesOptions> routeOut = Arrays.asList(
+            testRoute.build(testLambda, "ApiGatewayRouteToLambda0"),
+            rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1"),
             createRoute.build(createLambda, "ApiGatewayRouteToLambda2"),
             deleteRoute.build(deleteLambda, "ApiGatewayRouteToLambda3"),
             getRoute.build(retrieveLambda, "ApiGatewayRouteToLambda4"),
@@ -70,8 +79,10 @@ public class BackEndStack extends Stack {
         ICertificate cert = certFinder.find(this);
         DomainName subDomain = apiDomainBuilder.build(this, "MySubDomain", SUBDOMAIN_NAME, cert);
 
-        HttpApi api = apiBuilder.build(this, "MyApi", subDomain, root.getIntegration());
-        apiBuilder.buildMap(this, "MyBasePathMap", api, subDomain, "task");
+        HttpApi api = apiBuilder.build(this, "MyApi", subDomain);
+        LogGroup accessLog = apiLogBuilder.build(this, "MyApiLog");
+        CfnStage defaultStage = apiBuilder.buildStage(this, "MyApiDefaultStage", api, accessLog);
+        apiBuilder.buildMap(this, "MyBasePathMap", api, subDomain, "task", defaultStage);
 
         // add all the lambda routes outgoing from apigateway
         routeOut.forEach(api::addRoutes);

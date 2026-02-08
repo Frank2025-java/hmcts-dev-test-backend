@@ -1,12 +1,11 @@
 package uk.co.frankz.hmcts.dts.aws.infra;
 
-import software.amazon.awscdk.services.apigatewayv2.ApiMapping;
-import software.amazon.awscdk.services.apigatewayv2.ApiMappingProps;
-import software.amazon.awscdk.services.apigatewayv2.DomainMappingOptions;
+import software.amazon.awscdk.services.apigatewayv2.CfnApiMapping;
+import software.amazon.awscdk.services.apigatewayv2.CfnStage;
 import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.apigatewayv2.HttpApi;
 import software.amazon.awscdk.services.apigatewayv2.HttpApiProps;
-import software.amazon.awscdk.services.apigatewayv2.HttpRouteIntegration;
+import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 
 /**
@@ -26,18 +25,13 @@ public class ApiGatewayBuilder {
      * @param scope     of construct
      * @param id        as CDK identifier in the generated asset files
      * @param apiDomain reference to the subdomain for this api gateway
-     * @param defaultLambda will be the default lambda target in this domain
      * @return
      */
-    public HttpApi build(Construct scope, String id, DomainName apiDomain, HttpRouteIntegration defaultLambda) {
-
-        // Leave mappingKey undefined for the root path mapping.
-        var rootMap = DomainMappingOptions.builder().domainName(apiDomain).build();
+    public HttpApi build(Construct scope, String id, DomainName apiDomain) {
 
         HttpApiProps props = HttpApiProps.builder()
             .apiName(displayName)
-            .defaultIntegration(defaultLambda)
-            .defaultDomainMapping(rootMap)
+            .createDefaultStage(false)
             .build();
 
         return new HttpApi(scope, id, props);
@@ -53,19 +47,46 @@ public class ApiGatewayBuilder {
      * @param scope     of construct
      * @param id        as CDK identifier in the generated asset files
      * @param api       constructed (build) HttpApi
-     * @param subDomain
-     * @param basePath   which is
+     * @param subDomain sub domain
+     * @param basePath  like "/task"
+     * @param stage     like the default stage level 1 CDK construct
      */
-    public void buildMap(Construct scope, String id, HttpApi api, DomainName subDomain, String basePath) {
+    public void buildMap(Construct scope, String id,
+                         HttpApi api,
+                         DomainName subDomain,
+                         String basePath,
+                         CfnStage stage) {
 
-        ApiMappingProps props = ApiMappingProps.builder()
-            .api(api)
+        var map = CfnApiMapping.Builder
+            .create(scope, id)
+            .apiId(api.getHttpApiId())
             .domainName(subDomain)
-            .stage(api.getDefaultStage())
+            .stage(stage.getStageName())
             .apiMappingKey(basePath)
             .build();
 
-        new ApiMapping(scope, id, props);
+        // Tell Cloud Formation to create map after stage created
+        map.addDependency(stage);
+    }
 
+    public CfnStage buildStage(Construct scope, String id, HttpApi api, LogGroup log) {
+
+        var settings = CfnStage.AccessLogSettingsProperty
+            .builder()
+            .destinationArn(log.getLogGroupArn())
+            .format("{\"requestId\":\"$context.requestId\""
+                        + ",\"status\":\"$context.status\""
+                        + ",\"httpMethod\":\"$context.httpMethod\""
+                        + ",\"path\":\"$context.path\""
+                        + ",\"responseLatency\":\"$context.responseLatency\"}")
+            .build();
+
+        return CfnStage.Builder
+            .create(scope, id)
+            .apiId(api.getHttpApiId())
+            .stageName("$default")
+            .autoDeploy(true)
+            .accessLogSettings(settings)
+            .build();
     }
 }

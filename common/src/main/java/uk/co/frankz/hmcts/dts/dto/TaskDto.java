@@ -2,7 +2,6 @@ package uk.co.frankz.hmcts.dts.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -39,14 +38,9 @@ public class TaskDto {
      * required non-null value, initialised with current time.
      * In the REST API String will be converted using ISO standard,
      * which is left for Spring REST implementation to do.
-     * <br/>
-     * Note that we allow here to have a Spring reference
-     * as the annotation, to complicate things not more
-     * like we do with the id field for Task.
      *
-     * @see org.springframework.format.annotation.DateTimeFormat.ISO DATE_TIME
+     * @see org.springframework.format.annotation.DateTimeFormat.ISO
      **/
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime due = LocalDateTime.now();
 
     @Override

@@ -1,0 +1,56 @@
+plugins {
+  id 'java-library'
+  alias(libs.plugins.shadow)
+}
+
+group = 'uk.co.frankz.hmcts.dts'
+version = '0.0.1'
+
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation project(":common")
+  implementation libs.jakarta.validation
+  implementation libs.commons.lang3
+  implementation libs.jackson.core
+  implementation libs.jackson.databind
+  implementation libs.jackson.jsr310
+  implementation libs.aws.lambda.core
+  implementation libs.aws.lambda.events
+  implementation libs.aws.dynamobb
+  implementation libs.aws.dynamobb.enh
+  implementation libs.aws.sts
+
+  implementation libs.swagger.annotations
+
+  testImplementation(platform('org.junit:junit-bom:6.0.2'))
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testImplementation libs.mockito.core
+  testImplementation libs.mockito.junit
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+test {
+  useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+  // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
+  options.release = 17
+}
+
+shadowJar {
+  destinationDirectory = file("../assets")
+  archiveVersion = ""
+  archiveClassifier = ""
+  archiveFileName = "functions.jar"
+
+  manifest {
+    attributes("Implementation-Title": group,
+      "Implementation-Version": version,
+      "Main-Class": mainClassName)
+  }
+}

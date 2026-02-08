@@ -18,8 +18,6 @@ import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 public class UpdateTaskHandler extends BaseTaskHandler
     implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
@@ -45,7 +43,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         @ApiResponse(
             responseCode = "200",
             description = "Task matching provided id.",
-            content = {@Content(mediaType = APPLICATION_JSON_VALUE)}),
+            content = {@Content(mediaType = "application/json")}),
         @ApiResponse(
             responseCode = "400",
             description = "No task matching the provided id, or invalid status.",
@@ -68,7 +66,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         @ApiResponse(
             responseCode = "200",
             description = "Updated Task.",
-            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TaskDto.class))}),
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "No task matching the id in the provided Task.",

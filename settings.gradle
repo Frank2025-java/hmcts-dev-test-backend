@@ -1,7 +1,10 @@
 rootProject.name = 'hmcts-dev-test-backend'
 
+include 'common'
 include 'functionalTest'
 include 'integrationTest'
 include 'smokeTest'
 include 'infrastructure'
 include 'assets'
+
+include 'aws'

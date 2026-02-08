@@ -37,7 +37,7 @@ public class TaskException extends IllegalArgumentException {
     public static String toString(Exception e) {
         if (e instanceof TaskException) {
             // Do not double wrap TaskException
-            return e.getMessage();
+            return e.getClass().getSimpleName() + ":" + e.getMessage();
         } else if (StringUtils.isBlank(e.getMessage())) {
             // Do not rely on e.getMessage, as, for example, null pointers have a blank message
             return e.toString();

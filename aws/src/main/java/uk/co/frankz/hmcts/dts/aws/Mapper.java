@@ -14,7 +14,7 @@ import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
  * Mapper represents the implementation of the conversion of a Data Transfer Object
  * to an Entity that can be stored/retrieved in/from the repository.
  * <br>
- * It extends the @See uk.co.frankz.hmcts.dts.dto.Mapper for the
+ * It extends the @See dto.Mapper for the
  * basic domain properties, with an implementation which is
  * Spring dependent, which generates and keeps the id unique.
  */

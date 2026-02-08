@@ -7,19 +7,14 @@ plugins {
 dependencies {
   implementation libs.aws.cdk
   implementation libs.constructs
-
-  implementation fileTree(dir: '../build/libs', include: '*.jar')
+  implementation project(":common")
 }
 
-// Github Autobuilkd error: release version 21 not supported
+// Github Autobuild error: release version 21 not supported
 // LambdaBuilder builds for Version 17, whereas github Analyse tool runs with 17
 tasks.withType(JavaCompile) {
   options.release = 17
 }
-
-compileJava.dependsOn ':jar'
-compileJava.dependsOn ':bootJar'
-
 
 application {
   mainClassName = 'uk.co.frankz.hmcts.dts.aws.infra.CloudAssemblerApplication'

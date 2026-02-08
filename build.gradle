@@ -7,7 +7,6 @@ plugins {
   id 'org.sonarqube' version '7.2.2.6593'
   // Applies analysis tools including checkstyle and OWASP Dependency checker.
   id 'uk.gov.hmcts.java' version '0.12.67'
-  alias(libs.plugins.shadow)
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -181,12 +180,9 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
+  implementation project(":common")
   implementation libs.commons.collection4
   implementation libs.eclipse.store.spring
-  implementation libs.aws.lambda.core
-  implementation libs.aws.lambda.events
-  implementation libs.aws.dynamobb
-  implementation libs.aws.dynamobb.enh
 
   testImplementation(platform('org.junit:junit-bom:6.0.2'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
@@ -214,17 +210,4 @@ rootProject.tasks.named("processSmokeTestResources") {
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
-}
-
-shadowJar {
-  destinationDirectory = file("./assets")
-  archiveVersion = ""
-  archiveClassifier = ""
-  archiveFileName = "functions.jar"
-
-  manifest {
-    attributes("Implementation-Title": group,
-      "Implementation-Version": version,
-      "Main-Class": mainClassName)
-  }
 }

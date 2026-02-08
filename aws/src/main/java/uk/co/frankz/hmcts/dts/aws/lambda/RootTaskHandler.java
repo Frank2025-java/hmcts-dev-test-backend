@@ -6,7 +6,6 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.web.bind.annotation.GetMapping;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
@@ -45,7 +44,7 @@ public class RootTaskHandler extends BaseTaskHandler
         + "</body></html>";
 
     @Operation(summary = "Redirect to a success icon on the WWW site.")
-    @GetMapping(Action.PATH.ROOT)
+    //@GetMapping(Action.PATH.ROOT)
     @Override
     public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent input, Context context) {
 

@@ -65,6 +65,8 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
 
             Map<String, String> pathParams = event.getPathParameters();
 
+            out.log("Request: " + event.getBody());
+
             Pair<String, Integer> result = handle(action, event.getBody(), pathParams);
 
             response.setStatusCode(result.getRight());

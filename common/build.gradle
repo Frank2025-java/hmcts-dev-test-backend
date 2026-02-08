@@ -1,0 +1,42 @@
+plugins {
+  id 'java-library'
+}
+
+group = 'uk.co.frankz.hmcts.dts'
+version = '0.0.1'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation libs.lombok
+  annotationProcessor libs.lombok
+  implementation libs.jakarta.validation
+  implementation libs.commons.lang3
+  implementation libs.commons.collection4
+  implementation libs.slf4j
+
+  testImplementation(platform('org.junit:junit-bom:6.0.2'))
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testImplementation libs.mockito.core
+  testImplementation libs.mockito.junit
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+test {
+  useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+  // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
+  options.release = 17
+}
+
+jar {
+  archiveFileName = "common.jar"
+
+  manifest {
+    attributes('Implementation-Version': project.version.toString())
+  }
+}

@@ -19,8 +19,6 @@ import uk.co.frankz.hmcts.dts.service.TaskService;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 public class RetrieveTaskHandler extends BaseTaskHandler
     implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
@@ -62,7 +60,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "200",
             description = "Non-empty array of Tasks.",
             content = @Content(
-                mediaType = APPLICATION_JSON_VALUE,
+                mediaType = "application/json",
                 schema = @Schema(implementation = TaskDto[].class))),
         @ApiResponse(responseCode = "400", description = "No tasks.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
@@ -79,7 +77,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
     @Operation(summary = "Retrieve a task by ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Task matching provided id.",
-            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TaskDto.class))}),
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = TaskDto.class))}),
         @ApiResponse(responseCode = "400", description = "No task matching the provided id.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })

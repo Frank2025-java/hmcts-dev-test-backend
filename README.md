@@ -64,109 +64,115 @@ it uses a persistence repository and generates documentation.
 
 ```
 hmcts-dev-test-backend/
-    ├── img/                                                  # pictures for read.me
+    ├── aws/                                               # AWS specific implementation
+    │   ├── src/
+    │   │   ├── main/
+    │   │   │   └── java/uk/co/frankz/hmcts/dts/aws/
+    │   │   │        ├── lambda                           # AWS Serverless functions similar as Spring ctrl
+    │   │   │        │   ├── BaseTaskHandler.java
+    │   │   │        │   ├── RootTaskHandler.java
+    │   │   │        │   ├── CreateTaskHandler.java
+    │   │   │        │   ├── DeleteTaskHandler.java
+    │   │   │        │   ├── UpdateTaskHandler.java
+    │   │   │        │   ├── DynamoDbTestHandler.java     # Lambda to find cause of DynamoDb connect issue
+    │   │   │        │   └── RetrieveTaskHandler.java
+    │   │   │        ├── dynamodb/                        # AWS DynamoDb database specifics
+    │   │   │        │   ├── TaskWithId.java              # Entity with annotation gating id
+    │   │   │        │   └── TaskStoreImpl.java           # CRUD implementation for persistence
+    │   │   │        ├── Mapper.java                      # Convertor between Dto antity with id
+    │   │   │        ├── TaskService.java                 # CRUD logic for task withfor DynamoDb
+    │   │   │        ├── TaskProperties.java              # Constants for AWS implemtion
+    │   │   │        └── TaskExceptionHandler.java        # Logic for exception display to user
+    │   │   └── test/
+    │   └── build.gradle
+    ├── img/                                              # pictures for read.me
     ├── src/
     │   ├── main/
     │   │   ├── java/
-    │   │   │   └── uk/
-    │   │   │       ├── co/frankz/hmcts/dts/
-    │   │   │       │    ├── aws/                              # AWS specific implementation
-    │   │   │       │    │   ├── lambda/                       # AWS Serverless functions similar as Spring ctrl
-    │   │   │       │    │   │   ├── BaseTaskHandler.java
-    │   │   │       │    │   │   ├── RootTaskHandler.java
-    │   │   │       │    │   │   ├── CreateTaskHandler.java
-    │   │   │       │    │   │   ├── DeleteTaskHandler.java
-    │   │   │       │    │   │   ├── UpdateTaskHandler.java
-    │   │   │       │    │   │   └── RetrieveTaskHandler.java
-    │   │   │       │    │   ├── dynamodb/                     # AWS DynamoDb database specifics
-    │   │   │       │    │   │   ├── TaskWithId.java           # Entity with annotation generating id
-    │   │   │       │    │   │   └── TaskStoreImpl.java        # CRUD implementation for DynamoDb
-    │   │   │       │    │   ├── Mapper.java                   # Convertor between Dto and Entity with id
-    │   │   │       │    │   ├── TaskService.java              # CRUD logic for task with id for DynamoDb
-    │   │   │       │    │   ├── TaskProperties.java           # Constants for AWS implementation
-    │   │   │       │    │   └── TaskExceptionHandler.java     # Logic for exception displayed to user
-    │   │   │       │    │
-    │   │   │       │    ├── spring/                            # Implementation with Spring annotations
-    │   │   │       │    │   ├── controller/                    # Spring Controllers for REST API
-    │   │   │       │    │   │   ├── RootController.java
-    │   │   │       │    │   │   ├── RootTaskController.java
-    │   │   │       │    │   │   ├── CreateTaskController.java
-    │   │   │       │    │   │   ├── DeleteTaskController.java
-    │   │   │       │    │   │   ├── UpdateTaskController.java
-    │   │   │       │    │   │   └── RetrieveTaskController.java
-    │   │   │       │    │   ├── Mapper.java                       # Convertor between dto - entity/id (Spring)
-    │   │   │       │    │   ├── TaskStore.java                    # CRUD impl Spring adaptor for Eclipse Store
-    │   │   │       │    │   ├── TaskWithId.java                   # Task representing entity with id (Spring)
-    │   │   │       │    │   ├── Application.java                  # Runnable Spring Boot application class
-    │   │   │       │    │   ├── TaskService.java                  # CRUD logic for task with id (Spring managed)
-    │   │   │       │    │   ├── TaskExceptionHandler.java         # Spring Controller Exception
-    │   │   │       │    │   ├── RepositoryHeathIndicator.java     # Logic to check whether app should work
-    │   │   │       │    │   └── TaskStoreEclipseStoreConfig.java  # Configuration Spring adaptor for EclipseStore
-    │   │   │       │    │
-    │   │   │       │    ├── dto/                              # Data Transfer Objects
-    │   │   │       │    │   ├── Mapper.java                   # Common convertor between dto and model
-    │   │   │       │    │   └── TaskDto.java                  # Task Data Transfer Object
-    │   │   │       │    │
-    │   │   │       │    ├── model/                            # Application entities
-    │   │   │       │    │   ├── exception/                    # Application exceptions
-    │   │   │       │    │   │   ├── TaskException.java                # base exception for all app exceptions
-    │   │   │       │    │   │   ├── TaskJsonException.java            # app exception for json (de-)serialisation
-    │   │   │       │    │   │   ├── TaskStoreException.java           # app persistence exception
-    │   │   │       │    │   │   ├── TaskNoMatchException.java         # app exception suggesting valid args
-    │   │   │       │    │   │   ├── TaskNotFoundException.java        # App invalid identifier exception
-    │   │   │       │    │   │   └── TaskInvalidArgumentException.java # App illegal argument exception
-    │   │   │       │    │   ├── Task.java                      # Model representing entity of a Task
-    │   │   │       │    │   ├── ITask.java                     # Interface for task getters and setters
-    │   │   │       │    │   ├── Status.java                    # Enum for status of a Task
-    │   │   │       │    │   └── EntityWithId.java              # Interface generalisation for entity with id
-    │   │   │       │    │
-    │   │   │       │    └── service/                          # Common functional code for Lambda and Spring impl
-    │   │   │       │        ├── Header.java                   # Enum for headers in Http
-    │   │   │       │        ├── Action.java                   # Common http paths covered in Lambda and Spring
-    │   │   │       │        ├── TaskStore.java                # Common persistance interface for Lambda and Spring
-    │   │   │       │        └── TaskService.java              # Common service interface for Lambda and Spring
-    │   │   │       │
-    │   │   │       └── gov/hmcts/reform/dev/             # Original HMCTS Demo application
+    │   │   │   └── uk/co/frankz/hmcts/dts/spring/        # Implementation with Spring annotations
+    │   │   │        ├── controller/                      # Spring Controllers for REST API
+    │   │   │        │   ├── RootController.java
+    │   │   │        │   ├── RootTaskController.java
+    │   │   │        │   ├── CreateTaskController.java
+    │   │   │        │   ├── DeleteTaskController.java
+    │   │   │        │   ├── UpdateTaskController.java
+    │   │   │        │   └── RetrieveTaskController.java
+    │   │   │        ├── Mapper.java                      # Convertor between dto - entity/id (Spring)
+    │   │   │        ├── TaskStore.java                   # CRUD impl Spring adaptor for Eclipse Store
+    │   │   │        ├── TaskWithId.java                  # Task representing entity with id (Spring)
+    │   │   │        ├── Application.java                 # Runnable Spring Boot application class
+    │   │   │        ├── TaskService.java                 # CRUD logic for task with id (Spring managed)
+    │   │   │        ├── TaskExceptionHandler.java        # Spring Controller Exception
+    │   │   │        ├── RepositoryHealthIndicator.java   # Logic to check whether app should work
+    │   │   │        └── TaskStoreEclipseStoreConfig.java # Configuration Spring adaptor for EclipseStore
+    │   │   │
     │   │   └── resources/
     │   │       └── application.yaml                      # Spring Boot properties, shared with HMCTS Demo
-    │   │
     │   ├── test/                                         # Unit tests
     │   ├── smokeTest/
     │   ├── functionalTest/                               # Functional tests
     │   │   └── java/
-    │   │       └── uk/
-    │   │           ├── co/frankz/hmcts/dts/
-    │   │           │   └── CrudTaskFunctionalTest.java   # Test to Create, Retrieve, Update and Delete over REST
-    │   │           └── gov/hmcts/reform/dev/
-    │   │               └── SampleFunctionalTest.java     # Test for original HMCTS Demo app
+    │   │       └── uk/co/frankz/hmcts/dts/
+    │   │           └── CrudTaskFunctionalTest.java       # Test to Create, Retrieve, Update and Delete over REST
+    │   │
     │   └── integrationTest/                              # Integration tests with Health check of running app
-    ├── assets/
-    ├── smokeTest/
-    │   └── build/
-    │       └── sonar-resolver
-    ├── functionalTest/
-    │   └── build/
-    │       └── sonar-resolver
-    ├── infrastructure/                                 # Project the produces the Jar for the Assets project
+    ├── assets/                                           # Project that works with AWS and CDK CLI commands
+    ├── common/
+    │   ├── src/
+    │   │   ├── main/
+    │   │   │   ├── java/uk/co/frankz/hmcts/dts/
+    │   │   │   │   ├── dto/                              # Data Transfer Objects
+    │   │   │   │   │   ├── Mapper.java                   # Common convertor between dto and model
+    │   │   │   │   │   └── TaskDto.java                  # Task Data Transfer Object
+    │   │   │   │   ├── model/                            # Application entities
+    │   │   │   │   │   ├── exception/                    # Application exceptions
+    │   │   │   │   │   │   ├── TaskException.java                # base exception for all app exceptions
+    │   │   │   │   │   │   ├── TaskJsonException.java            # app exception for json (de-)serialisation
+    │   │   │   │   │   │   ├── TaskStoreException.java           # app persistence exception
+    │   │   │   │   │   │   ├── TaskNoMatchException.java         # app exception suggesting valid args
+    │   │   │   │   │   │   ├── TaskNotFoundException.java        # App invalid identifier exception
+    │   │   │   │   │   │   └── TaskInvalidArgumentException.java # App illegal argument exception
+    │   │   │   │   │   │
+    │   │   │   │   │   ├── Task.java                     # Model representing entity of a Task
+    │   │   │   │   │   ├── ITask.java                    # Interface for task getters and setters
+    │   │   │   │   │   ├── Status.java                   # Enum for status of a Task
+    │   │   │   │   │   └── EntityWithId.java             # Interface generalisation for entity with id
+    │   │   │   │   └── service/                          # Common functional code for Lambda and Spring impl
+    │   │   │   │       ├── Action.java                   # Common http paths covered in Lambda and Spring
+    │   │   │   │       ├── Header.java                   # Enum for headers in Http
+    │   │   │   │       ├── TaskStore.java                # Common persistance interface for Lambda and Spring
+    │   │   │   │       └── TaskService.java              # Common service interface for Lambda and Spring
+    │   │   │   └── resources
+    │   │   └── test/
+    │   └── build.gradle
+    ├── gradle/
+    │   ├── wrapper/
+    │   └── libs.versions.toml                            # Gradle version catalog
+    ├── README.md
+    ├── build.gradle
+    ├── infrastructure/                                    # Project the produces the Jar for the Assets project
     │   └── src/
     │       ├── main/
-    │          ├── java/
-    │             └── uk/co/frankz/hmcts/dts/aws/infra/  # Infrastructure as (java) code for AWS components
-    │                 ├── CloudAssemblerApplication.java # Application to start generating components
-    │                 ├── BackEndStack.java              # Generating all components for the app
-    │                 ├── MyEnvironment.java             # AWS and CDK (local) environment settings
-    │                 ├── BackEndComponent.java          # Component variables that need generating
-    │                 ├── ProvisionedComponent.java      # Component variables of provisioned components
-    │                 ├── LambdaBuilder.java             # Logic to generate a Serverless Function (AWS Lambda)
-    │                 ├── DnsEntryBuilder.java           # Logic to generate a DNS entry (AWS Route53 entry)
-    │                 ├── SubDomainBuilder.java          # Logic to generate a sub domain for API Gateway
-    │                 ├── ApiGatewayBuilder.java         # Logic to generate AWS API Gateway component for REST
-    │                 ├── LambdaRouteBuilder.java        # Logic to generate link API Gateway to Lambda
-    │                 ├── SubDomainCertFinder.java       # Logic to generate code to lookup the certificate
-    │                 └── TableBuilder.java              # Logic to generate a DynamoDb table
-    │
-    └── assets/                                          # Project that works with AWS and CDK CLI commands
-
+    │       │   ├── java/uk/co/frankz/hmcts/dts/aws/infra/ # Infrastructure as (java) code for AWS components
+    │       │   │    ├── BackEndStack.java                 # Logic to generate all components for the app
+    │       │   │    ├── TableBuilder.java                 # Logic to generate a DynamoDb table
+    │       │   │    ├── LambdaBuilder.java                # Logic to generate a Serverless Function (AWS Lambda)
+    │       │   │    ├── MyEnvironment.java                # AWS and CDK (local) environment settings
+    │       │   │    ├── DnsEntryBuilder.java              # Logic to generate a DNS entry (AWS Route53 entry)
+    │       │   │    ├── LogGroupBuilder.java              # Logic to generate a Log location
+    │       │   │    ├── BackEndComponent.java             # List of variables of components to generate
+    │       │   │    ├── SubDomainBuilder.java             # Logic to generate a sub domain for API Gateway
+    │       │   │    ├── ApiGatewayBuilder.java            # Logic to generate AWS API Gateway component
+    │       │   │    ├── LambdaRouteBuilder.java           # Logic to generate link API Gateway to Lambda
+    │       │   │    ├── SubDomainCertFinder.java          # Logic to generate code to lookup the certificate
+    │       │   │    ├── ProvisionedComponent.java         # List of variables of provisioned components
+    │       │   │    └── CloudAssemblerApplication.java    # Application to start generating components
+    │       │   └── resources
+    │       └── test/
+    │           ├── java
+    │           └── resources/
+    │               └── command.txt                        # Curl command to execute in Powershell
+    ├── settings.gradle                                    # Gradle to allow module dependencies
 ```
 
 
@@ -322,6 +328,10 @@ the lambda labelled "Root", connect to the table._. That image is shown above.
 With deploying it, I realised that I have hard-coded my domain name and certificate
 in _ProvisionedComponent.java_, which I do not see an easy way around that.
 
+Then I spend many days to find out that the shadowJar that I produced contained Springboot and Logback
+libraries that causes a not responding lambda. Those libraries load during invocation, causing a timeout
+after 10 seconds. That made me splitting up the code in separate IDE/Gradle modules, so that controlling
+what is in a shadowJar, is easier.
 
 ## ✉ Acknowledgement and Support
 Contact mailto:frankz@iae.nl for support.

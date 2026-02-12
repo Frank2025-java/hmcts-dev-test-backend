@@ -25,6 +25,7 @@ public class LambdaBuilder {
     private final static Map<String, String> envVariables = Map.of(
         "LOG_LEVEL", "DEBUG"
         , "ROOT_LOGGING_LEVEL", "DEBUG"
+        , "AWS_SDK_LOG_LEVEL", "DEBUG"
     );
 
     /**
@@ -56,7 +57,7 @@ public class LambdaBuilder {
             .runtime(Runtime.JAVA_17)
             .handler(requestHandlerClassName)
             .memorySize(128)
-            .timeout(Duration.seconds(10))
+            .timeout(Duration.seconds(20))
             .architecture(Architecture.X86_64)
             .functionName(displayName)
             .environment(envVariables)

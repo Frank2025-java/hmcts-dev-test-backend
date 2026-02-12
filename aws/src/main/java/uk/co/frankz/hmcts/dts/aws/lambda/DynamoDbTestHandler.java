@@ -3,8 +3,6 @@ package uk.co.frankz.hmcts.dts.aws.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -12,13 +10,17 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
-import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.TaskProperties;
 
+import java.util.concurrent.CompletableFuture;
+
 public class DynamoDbTestHandler implements RequestHandler<Object, String> {
+
+    private static final CompletableFuture<Void> SLF4J = ColdStartRoutine.SLF4J.warmup();
+
+    private static final CompletableFuture<Void> BACKGROUND =
+        ColdStartRoutine.concurrentWarmup(ColdStartRoutine.DYNAMODB, ColdStartRoutine.STS);
 
     private static final String MARKER = "TEST LOG ----------->>>>>>>     ";
 
@@ -29,19 +31,16 @@ public class DynamoDbTestHandler implements RequestHandler<Object, String> {
 
         LambdaLogger out = context.getLogger();
 
+        out.log(MARKER + "Waiting for background initialisation");
+
+        // wait until initialised.
+        BACKGROUND.join();
+
         // Detect API Gateway event
         out.log(MARKER + "Incoming object is of type :" + input.getClass().getName());
 
         try {
-            logIdentity(out);
-
-            AwsCredentialsProvider credProv = DefaultCredentialsProvider.create();
-
-            out.log(MARKER + "Credentials setup: " + credProv.toString());
-
-            AwsCredentials cred = credProv.resolveCredentials();
-
-            out.log(MARKER + "Credentials resolved: " + cred.getClass().getName());
+            out.log(MARKER + "DynamoDbClient");
 
             DynamoDbClient dynamo = DynamoDbClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
@@ -64,22 +63,11 @@ public class DynamoDbTestHandler implements RequestHandler<Object, String> {
             return "UnSuccessful scan of table: " + e.toString();
         } finally {
             out.log(MARKER + "Scan attempt finished.");
+
+            // do not finish, but wait for all logging appenders plugged in, in case of cold start
+            SLF4J.join();
         }
 
-    }
-
-    public void logIdentity(LambdaLogger log) {
-        StsClient sts = StsClient.builder()
-            .region(Region.EU_WEST_1)
-            .build();
-
-        GetCallerIdentityResponse identity = sts.getCallerIdentity(
-            GetCallerIdentityRequest.builder().build()
-        );
-
-        log.log(MARKER + "Account: " + identity.account());
-        log.log(MARKER + "Arn: " + identity.arn());
-        log.log(MARKER + "UserId: " + identity.userId());
     }
 
 }

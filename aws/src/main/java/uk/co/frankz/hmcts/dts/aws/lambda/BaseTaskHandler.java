@@ -18,6 +18,8 @@ import uk.co.frankz.hmcts.dts.service.Header;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import static uk.co.frankz.hmcts.dts.aws.TaskExceptionHandler.setErrorOnResponse;
 
@@ -28,7 +30,12 @@ import static uk.co.frankz.hmcts.dts.aws.TaskExceptionHandler.setErrorOnResponse
  * This base class has the code to handle a API Gateway request and response, and
  * has a handle function for the actual Lambda to do their processing.
  */
-abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse>
+{
+
+    private static final CompletableFuture<Void> SLF4J = ColdStartRoutine.SLF4J.warmup();
+
+    private static final CompletableFuture<Void> DYNAMODB = ColdStartRoutine.DYNAMODB.warmup();
 
     protected final TaskService<TaskWithId> service;
     protected final Mapper json;

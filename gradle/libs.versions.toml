@@ -14,16 +14,16 @@ lombok                  = { group = "org.projectlombok", name = "lombok", versio
 
 jakarta-validation      = { group = "jakarta.validation", name = "jakarta.validation-api", version = "3.0.2" }
 swagger-annotations     = { group = "io.swagger.core.v3", name = "swagger-annotations", version = "2.2.22" }
-springdoc-openapi       = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version = "2.8.15" }
 
 commons-collection4     = { group = 'org.apache.commons', name = 'commons-collections4', version = "4.5.0" }
 commons-lang3           = { group = "org.apache.commons", name = "commons-lang3", version = "3.20.0" }
-slf4j                   = { group = "org.slf4j", name = "slf4j-api", version = "2.0.12" }
 jackson-core            = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
 jackson-databind        = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 jackson-jsr310          = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
 
-
+slf4j                   = { group = "org.slf4j", name = "slf4j-api", version = "2.0.12" }
+slf4j-log4j2            = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version = "2.23.1" }
+aws-lambda-log4j2       = { group = "com.amazonaws", name = "aws-lambda-java-log4j2", version = "1.6.0" }
 
 mockito-core            = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-junit           = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
@@ -32,6 +32,9 @@ eclipse-store-spring    = { group = 'software.xdev', name = 'spring-data-eclipse
 
 aws-lambda-core         = { group = "com.amazonaws", name = "aws-lambda-java-core", version = "1.4.0" }
 aws-lambda-events       = { group = "com.amazonaws", name = "aws-lambda-java-events", version = "3.16.1" }
+
+aws-http-jdk            = { group = "software.amazon.awssdk", name = "url-connection-client", version.ref = "awssdk"}
+
 aws-dynamobb            = { group = "software.amazon.awssdk", name = "dynamodb", version.ref = "awssdk" }
 aws-dynamobb-enh        = { group = "software.amazon.awssdk", name = "dynamodb-enhanced", version.ref = "awssdk" }
 aws-sts                 = { group = "software.amazon.awssdk", name = "sts", version.ref = "awssdk" }

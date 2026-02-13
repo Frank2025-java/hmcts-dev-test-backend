@@ -47,11 +47,14 @@ public abstract class Mapper {
 
         Status status = Status.parse(dto.getStatus());
 
-        return newEntityWitId(dto.getId())
-            .setTitle(dto.getTitle())
-            .setDescription(dto.getDescription())
-            .setStatus(status)
-            .setDue(dto.getDue());
+        Task entity = newEntityWitId(dto.getId());
+
+        entity.setTitle(dto.getTitle());
+        entity.setDescription(dto.getDescription());
+        entity.setStatus(status);
+        entity.setDue(dto.getDue());
+
+        return entity;
     }
 
     public TaskDto toDto(Task entity) {

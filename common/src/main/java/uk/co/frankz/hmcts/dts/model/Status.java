@@ -2,6 +2,8 @@ package uk.co.frankz.hmcts.dts.model;
 
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 
+import java.util.stream.Stream;
+
 import static java.util.Arrays.stream;
 
 /**
@@ -25,5 +27,9 @@ public enum Status {
         } catch (Exception e) {
             throw new TaskNoMatchException(status, stream(Status.values()).map(Status::name));
         }
+    }
+
+    public static Stream<String> names() {
+        return stream(Status.values()).map(Status::name);
     }
 }

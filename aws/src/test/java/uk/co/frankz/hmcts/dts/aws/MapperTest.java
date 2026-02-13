@@ -12,6 +12,7 @@ import uk.co.frankz.hmcts.dts.model.Task;
 import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -26,7 +27,7 @@ class MapperTest {
 
     Mapper testSubject;
 
-    static final String TEST_ID = "12344";
+    static final UUID TEST_ID = UUID.fromString("12345678-1234-1234-1234-123456789012");
 
     static final String TEST_TIME_STR = "2026-02-05T10:11:30";
 
@@ -60,14 +61,14 @@ class MapperTest {
         testSubject = new Mapper();
 
         testDto = new TaskDto();
-        testDto.setId(TEST_ID);
+        testDto.setId(TEST_ID.toString());
         testDto.setDue(TEST_TIME);
         testDto.setTitle(TEST_TITLE);
         testDto.setDescription(TEST_DESC);
         testDto.setStatus(TEST_STATUS);
 
         testTask = new TaskWithId();
-        testTask.setId(TEST_ID);
+        testTask.setUUID(TEST_ID);
         testTask.setDescription(TEST_DESC);
         testTask.setDue(TEST_TIME);
         testTask.setTitle(TEST_TITLE);
@@ -79,7 +80,7 @@ class MapperTest {
         // given
 
         // when
-        Task actual = testSubject.newEntityWitId(TEST_ID);
+        Task actual = testSubject.newEntityWitId(TEST_ID.toString());
 
         // then
         assertInstanceOf(TaskWithId.class, actual);

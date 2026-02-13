@@ -23,8 +23,13 @@ dependencies {
   implementation libs.aws.dynamobb
   implementation libs.aws.dynamobb.enh
   implementation libs.aws.sts
+  implementation libs.aws.http.jdk
 
   implementation libs.swagger.annotations
+
+  implementation libs.slf4j
+  implementation libs.slf4j.log4j2
+  implementation libs.aws.lambda.log4j2
 
   testImplementation(platform('org.junit:junit-bom:6.0.2'))
   testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -53,4 +58,6 @@ shadowJar {
       "Implementation-Version": version,
       "Main-Class": mainClassName)
   }
+
+  mergeServiceFiles()   // SLF4J provider
 }

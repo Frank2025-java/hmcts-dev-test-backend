@@ -17,6 +17,8 @@ import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.service.Header;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
 
 import static uk.co.frankz.hmcts.dts.aws.TaskExceptionHandler.setErrorOnResponse;
@@ -34,7 +36,7 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
     protected final Mapper json;
 
     /**
-     * Warm container contructor. Should run on container start, but not on each invocation.
+     * Cold-start container constructor. Should run on container start, but not on each invocation.
      */
     protected BaseTaskHandler() {
         this(new uk.co.frankz.hmcts.dts.aws.TaskService(DefaultCredentialsProvider.create()), new Mapper());
@@ -74,6 +76,7 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
             response.setHeaders(Header.JSON);
 
         } catch (Exception e) {
+            out.log(stackTrace(e));
             out.log(TaskException.toString(e));
             setErrorOnResponse(e, response);
         }
@@ -81,6 +84,12 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         out.log("Response: " + response.getBody());
 
         return response;
+    }
+
+    private String stackTrace(Exception e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 
     protected abstract Pair<String, Integer> handle(

@@ -20,6 +20,9 @@ import java.util.Optional;
 
 import static uk.co.frankz.hmcts.dts.aws.Mapper.JACKSON;
 
+/**
+ * The implementation class that uses AWS DynamoDb to persist, retrieve, and delete Tasks.
+ */
 public class TaskStoreImpl implements TaskStore<TaskWithId> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskStoreImpl.class);

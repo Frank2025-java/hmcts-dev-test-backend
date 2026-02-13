@@ -16,10 +16,6 @@ import static java.util.Objects.requireNonNull;
  * The identifier is added by TaskWithId class, which is an extension
  * of this class, and is dependent on a Spring implementation
  * for generating the id.
- * <br/>
- * The setters in this class, validate if the value is required,
- * and return "this" to allow chaining,
- * which makes coding a bit less verbose.
  */
 @Getter
 public class Task implements ITask {
@@ -57,31 +53,27 @@ public class Task implements ITask {
     }
 
     @Override
-    public Task setTitle(String title) {
+    public void setTitle(String title) {
 
         requireNonNull(title);
         this.title = title;
-        return this;
     }
 
     @Override
-    public Task setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     @Override
-    public Task setDue(LocalDateTime due) {
+    public void setDue(LocalDateTime due) {
         requireNonNull(due);
         this.due = due == null ? null : ISO_DATE_TIME.format(due);
-        return this;
     }
 
     @Override
-    public Task setStatus(Status status) {
+    public void setStatus(Status status) {
         requireNonNull(status);
         this.status = status.name();
-        return this;
     }
 
     @Override

@@ -8,7 +8,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Task;
+import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
+
+import java.util.UUID;
 
 /**
  * Mapper represents the implementation of the conversion of a Data Transfer Object
@@ -47,7 +50,12 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
     @Override
     protected Task newEntityWitId(String id) {
         TaskWithId entityWithId = new TaskWithId();
-        entityWithId.setId(id);
+        try {
+            UUID uuid = id == null ? null : UUID.fromString(id);
+            entityWithId.setUUID(uuid);
+        } catch (Exception e) {
+            throw new TaskInvalidArgumentException(id, e);
+        }
         return entityWithId;
     }
 

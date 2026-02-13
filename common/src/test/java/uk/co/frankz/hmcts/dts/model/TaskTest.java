@@ -30,13 +30,59 @@ class TaskTest {
     }
 
     @Test
-    void shouldBeAbleToSetProperties() {
-        assertEquals("x", testSubject.setTitle("x").getTitle());
-        assertEquals("y", testSubject.setDescription("y").getDescription());
-        assertNull(testSubject.setDescription(null).getDescription());
-        assertEquals(Status.Deleted, testSubject.setStatus(Status.Deleted).getStatus());
+    void shouldBeAbleToSetPropertyTitle() {
+        // given
+
+        // when
+        testSubject.setTitle("x");
+
+        // then
+        assertEquals("x", testSubject.getTitle());
+    }
+
+    @Test
+    void shouldBeAbleToSetPropertyDescription() {
+        // given
+
+        // when
+        testSubject.setDescription("y");
+
+        // then
+        assertEquals("y", testSubject.getDescription());
+    }
+
+    @Test
+    void shouldBeAbleToSetPropertyStatus() {
+        // given
+
+        // when
+        testSubject.setStatus(Status.Deleted);
+
+        // then
+        assertSame(Status.Deleted, testSubject.getStatus());
+    }
+
+    @Test
+    void shouldBeAbleToSetPropertyDue() {
+        // given
         LocalDateTime givenTime = LocalDateTime.parse("2025-12-18T16:45:30");
-        assertEquals(givenTime, testSubject.setDue(givenTime).getDue());
+
+        // when
+        testSubject.setDue(givenTime);
+
+        // then
+        assertEquals(givenTime, testSubject.getDue());
+    }
+
+    @Test
+    void shouldAllowNullOnDescription() {
+        // given
+
+        // when
+        testSubject.setDescription(null);
+
+        // then
+        assertNull(testSubject.getDescription());
     }
 
     @Test

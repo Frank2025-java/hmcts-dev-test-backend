@@ -29,7 +29,7 @@ public class DnsEntryBuilder {
      * @param scope for CDK construction
      * @return my hosted zones created by AWS as part of domain frankz.co.uk hosted and created on AWS
      */
-    synchronized public IHostedZone find(Construct scope) {
+    public synchronized IHostedZone find(Construct scope) {
 
         if (hostedZone == null) {
 

@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
  * is needed, namely where setStatus is used.
  */
 public interface ITask {
-    Task setTitle(String title);
+    void setTitle(String title);
 
-    Task setDescription(String description);
+    void setDescription(String description);
 
-    Task setDue(LocalDateTime due);
+    void setDue(LocalDateTime due);
 
-    Task setStatus(Status status);
+    void setStatus(Status status);
 
     String getTitle();
 

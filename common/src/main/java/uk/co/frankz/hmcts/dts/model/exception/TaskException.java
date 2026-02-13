@@ -48,11 +48,13 @@ public class TaskException extends IllegalArgumentException {
     }
 
     protected static Task task(EntityWithId taskWithId) {
-        if (taskWithId instanceof Task) {
-            return (Task) taskWithId;
+        if (taskWithId instanceof Task entity) {
+            return entity;
         } else {
             // exception messages might not handle null, just have something to feedback.
-            return new Task().setDescription(String.valueOf(taskWithId));
+            Task task = new Task();
+            task.setDescription(String.valueOf(taskWithId));
+            return task;
         }
     }
 

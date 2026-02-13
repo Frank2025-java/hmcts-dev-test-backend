@@ -19,7 +19,7 @@ public class SubDomainCertFinder {
     }
 
     /**
-     * Certificate are created on the console, after which those get validated for use on the domain
+     * Certificate are created on the console, after which those get validated for use on the domain.
      *
      * @param scope for CDK construction
      * @return certificate

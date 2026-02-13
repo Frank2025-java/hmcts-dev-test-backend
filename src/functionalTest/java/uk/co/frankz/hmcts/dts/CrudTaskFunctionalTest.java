@@ -43,7 +43,7 @@ class CrudTaskFunctionalTest {
         ;
     }
 
-    @Value("${TEST_URL:http://localhost:4000}")
+    @Value("${TEST_URL:https://api.frankz.co.uk}")
     private String testUrl;
 
     static TaskDto testTaskInMemory;
@@ -79,11 +79,11 @@ class CrudTaskFunctionalTest {
         HttpStatus actualStatus = HttpStatus.valueOf(response.statusCode());
         assertEquals(expectedStatus, actualStatus);
 
-        assertNotNull(response.body());
+        assertNotNull(response.body(), "body should not be null");
         TaskDto actual = response.body().as(TaskDto.class);
-        assertTrue(StringUtils.isNotBlank(actual.getId()));
-        assertNotNull(actual.getStatus());
-        assertNotNull(actual.getDue());
+        assertTrue(StringUtils.isNotBlank(actual.getId()), "id should not be blank");
+        assertNotNull(actual.getStatus(), "status should not be null");
+        assertNotNull(actual.getDue(), "due should not be null");
 
         return actual;
     }

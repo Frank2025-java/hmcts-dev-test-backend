@@ -22,12 +22,13 @@ public class LambdaBuilder {
     private final String requestHandlerClassName;
     private final Code code;
 
-    private final static Map<String, String> envVariables = Map.of(
-        "LOG_LEVEL", "DEBUG"
-        , "ROOT_LOGGING_LEVEL", "DEBUG"
+    private static final Map<String, String> envVariables = Map.of(
+        "LOG_LEVEL", "DEBUG",
+        "ROOT_LOGGING_LEVEL", "DEBUG"
     );
 
     /**
+     * Constructor for this utility class.
      * @param name                    displayed as the name of the Lambda in AWS.
      * @param pathJarFile             location of code for the lambda.
      * @param requestHandlerClassName class name with package prefixes of the Lambda code.
@@ -47,7 +48,7 @@ public class LambdaBuilder {
      *
      * @param scope of construct
      * @param id    as CDK identifier in the generated asset files
-     * @return
+     * @return instance of a CDK Level 2 Lambda construct
      */
     public Function build(Construct scope, String id) {
 

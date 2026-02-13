@@ -33,7 +33,7 @@ public class LambdaRouteBuilder {
      * The http path is provided with the constructor arguments.
      *
      * @param lambda target for APIGateway.
-     * @return
+     * @return Instance of a CDK Level 2 construct for a Route on an Api Gateway
      */
     public AddRoutesOptions build(Function lambda, String id) {
 

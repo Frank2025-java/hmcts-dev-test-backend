@@ -18,6 +18,8 @@ public class LogGroupBuilder {
     }
 
     /**
+     * Constructor for this utility class.
+     *
      * @param scope of construct
      * @param id    as CDK identifier in the generated asset files
      * @return LogGroup construct

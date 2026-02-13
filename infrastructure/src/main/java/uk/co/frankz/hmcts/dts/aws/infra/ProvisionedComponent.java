@@ -2,7 +2,7 @@ package uk.co.frankz.hmcts.dts.aws.infra;
 
 /**
  * The available AWS components needed to generate constructs and are part of our infrastructure.
- * <p>
+ * <br>
  * The main domain is generated when signing up for AWS.
  * The certificate for the subdomain has a verification step that can take a bit of time,
  * and can take days for external verification or when it is not configured properly.

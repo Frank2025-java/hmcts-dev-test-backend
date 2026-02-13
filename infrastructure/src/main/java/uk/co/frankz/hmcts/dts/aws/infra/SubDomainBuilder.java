@@ -13,6 +13,8 @@ import static software.amazon.awscdk.services.apigatewayv2.SecurityPolicy.TLS_1_
 public class SubDomainBuilder {
 
     /**
+     * Constructor for this utility class.
+     *
      * @param scope         of construct
      * @param id            as CDK identifier in the generated asset files
      * @param subDomainName full name of subdomain like api.xxx.co.uk

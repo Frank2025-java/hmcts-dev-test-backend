@@ -84,7 +84,8 @@ class MapperTest {
 
         // then
         assertInstanceOf(TaskWithId.class, actual);
-        assertEquals(TEST_ID, ((TaskWithId) actual).getId());
+        assertEquals(TEST_ID, ((TaskWithId) actual).getUUID());
+        assertEquals(TEST_ID.toString(), ((TaskWithId) actual).getId());
     }
 
     @Test
@@ -108,7 +109,7 @@ class MapperTest {
 
         // then
         assertNotNull(actual);
-        assertEquals(TEST_ID, actual.getId());
+        assertEquals(TEST_ID.toString(), actual.getId());
     }
 
     @Test
@@ -132,7 +133,7 @@ class MapperTest {
 
         // then
         assertNotNull(actual);
-        assertEquals(TEST_ID, actual.getId());
+        assertEquals(TEST_ID.toString(), actual.getId());
     }
 
     @Test

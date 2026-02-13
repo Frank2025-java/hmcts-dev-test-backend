@@ -182,15 +182,19 @@ hmcts-dev-test-backend/
 
 
 ## 🧪 Testing
+
+### Unit Testing
 The unit test code coverage is close to 100%. Not all Spring features are covered.
 ![coverage](img/screenshot-codecover.png)
 
+### Functional Testing
 With Spring and a database repository, you would typical have a Spring test version for Functional tests.
 With our choice of instead of a Spring repository, but Eclipse Store local file system repository,
 we are not worried about integrating or smoke testing connections. The Functional test covers Integration and
 Smoke Tests for development. Integration and Smoke Tests will be useful for production.
 
-
+_CrudTaskFunctionalTest.java_ is runnable test, which starts up a Spring Boot for testing.
+By changing the TEST_URL, the test runs against Spring Boot backend, or against the AWS hosted backend.
 
 ## 🚀Deliverable
 The deliverable is a Spring Boot application packages in htmcts-dev-test-backend jar file,

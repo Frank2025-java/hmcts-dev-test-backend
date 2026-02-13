@@ -64,27 +64,32 @@ it uses a persistence repository and generates documentation.
 
 ```
 hmcts-dev-test-backend/
-    ├── aws/                                               # AWS specific implementation
+    ├── aws/                                              # AWS specific implementation
     │   ├── src/
     │   │   ├── main/
-    │   │   │   └── java/uk/co/frankz/hmcts/dts/aws/
-    │   │   │        ├── lambda                           # AWS Serverless functions similar as Spring ctrl
-    │   │   │        │   ├── BaseTaskHandler.java
-    │   │   │        │   ├── RootTaskHandler.java
-    │   │   │        │   ├── CreateTaskHandler.java
-    │   │   │        │   ├── DeleteTaskHandler.java
-    │   │   │        │   ├── UpdateTaskHandler.java
-    │   │   │        │   ├── DynamoDbTestHandler.java     # Lambda to find cause of DynamoDb connect issue
-    │   │   │        │   └── RetrieveTaskHandler.java
-    │   │   │        ├── dynamodb/                        # AWS DynamoDb database specifics
-    │   │   │        │   ├── TaskWithId.java              # Entity with annotation gating id
-    │   │   │        │   └── TaskStoreImpl.java           # CRUD implementation for persistence
-    │   │   │        ├── Mapper.java                      # Convertor between Dto antity with id
-    │   │   │        ├── TaskService.java                 # CRUD logic for task withfor DynamoDb
-    │   │   │        ├── TaskProperties.java              # Constants for AWS implemtion
-    │   │   │        └── TaskExceptionHandler.java        # Logic for exception display to user
+    │   │   │   └─ java/
+    │   │   │      ├─  uk/co/frankz/hmcts/dts/aws/
+    │   │   │      │   ├── lambda                         # AWS Serverless functions similar as Spring ctrl
+    │   │   │      │   │   ├── BaseTaskHandler.java
+    │   │   │      │   │   ├── RootTaskHandler.java
+    │   │   │      │   │   ├── CreateTaskHandler.java
+    │   │   │      │   │   ├── DeleteTaskHandler.java
+    │   │   │      │   │   ├── UpdateTaskHandler.java
+    │   │   │      │   │   └── RetrieveTaskHandler.java
+    │   │   │      │   ├── dynamodb/                      # AWS DynamoDb database specifics
+    │   │   │      │   │   ├── TaskWithId.java            # Entity with annotation gating id
+    │   │   │      │   │   ├── TaskStoreImpl.java         # CRUD implementation for persistence
+    │   │   │      │   │   ├── StatusConverter.java       # convertor for Status enum
+    │   │   │      │   │   ├── AutoUuidConverter.java     # convertor for UUID
+    │   │   │      │   │   └── IsoDateTimeConverter.java  # convertor for ISO string of LocalDateTime
+    │   │   │      │   ├── Mapper.java                    # Convertor between Dto antity with id
+    │   │   │      │   ├── TaskService.java               # CRUD logic for task withfor DynamoDb
+    │   │   │      │   ├── TaskProperties.java            # Constants for AWS implemtion
+    │   │   │      │   └── TaskExceptionHandler.java      # Logic for exception display to user
+    │   │   │      └── resources/
+    │   │   │          └── log4j2.xml                     # Log4j config for (debug) log in lambda
     │   │   └── test/
-    │   └── build.gradle
+    │   └── build.gradle                                  # Gradle tasks with shadowJar
     ├── img/                                              # pictures for read.me
     ├── src/
     │   ├── main/

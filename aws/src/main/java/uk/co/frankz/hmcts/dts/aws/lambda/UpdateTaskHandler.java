@@ -58,7 +58,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         String status = get(pathParams, Action.PARM.STATUS);
 
         TaskWithId taskWitId = service.update(id, status);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
         return Pair.of(body, HttpStatusCode.OK);
     }
@@ -81,7 +81,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
     Pair<String, Integer> update(String requestBody) {
         TaskWithId task = json.toEntity(requestBody);
         TaskWithId taskWitId = service.update(task);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
         return Pair.of(body, HttpStatusCode.OK);
     }

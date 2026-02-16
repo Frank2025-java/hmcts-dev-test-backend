@@ -139,7 +139,7 @@ class UpdateTaskHandlerTest {
     void shouldPropagateJsonExceptions(Action given) {
         // given
         TaskException givenEx = new TaskException("test message");
-        when(mockMapper.toJsonString(any(TaskWithId.class))).thenThrow(givenEx);
+        when(mockMapper.toDto(any(TaskWithId.class))).thenThrow(givenEx);
 
         // when
         Exception actual = assertThrows(

@@ -110,7 +110,7 @@ class UpdateTaskHandlerTest {
     }
 
     @Test
-    void shouldUpdate() throws Exception {
+    void shouldUpdate() {
         // given
 
         // when
@@ -125,7 +125,7 @@ class UpdateTaskHandlerTest {
     }
 
     @Test
-    void shouldUpdateStatus() throws Exception {
+    void shouldUpdateStatus() {
         // given
         String givenId = TEST_PARM.get(Action.PARM.ID);
         String givenStatus = TEST_PARM.get(Action.PARM.STATUS);
@@ -147,7 +147,7 @@ class UpdateTaskHandlerTest {
         mode = EnumSource.Mode.EXCLUDE,
         names = {"UPDATE", "UPDATE_STATUS"}
     )
-    void shouldNotInvokeOnService(Action givenOther) throws Exception {
+    void shouldNotInvokeOnService(Action givenOther) {
         // given - parameter
 
         // when

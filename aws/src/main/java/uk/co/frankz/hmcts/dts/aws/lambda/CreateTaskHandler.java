@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
@@ -23,6 +24,7 @@ public class CreateTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public CreateTaskHandler() {
         super();
     }
@@ -52,8 +54,8 @@ public class CreateTaskHandler extends BaseTaskHandler
 
         TaskWithId task = json.toEntity(request);
         TaskWithId taskWitId = service.createTask(task);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
-        return Pair.of(json.toJsonString(taskWitId), 201);
+        return Pair.of(body, HttpStatusCode.CREATED);
     }
 }

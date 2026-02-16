@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
@@ -25,6 +26,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public RetrieveTaskHandler() {
         super();
     }
@@ -65,13 +67,13 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "400", description = "No tasks.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
-    Pair<String, Integer> getAll() throws Exception {
+    Pair<String, Integer> getAll() {
 
         Stream<TaskWithId> tasks = service.getAll();
         TaskDto[] dtos = json.toDto(tasks);
         String body = json.toJsonString(dtos);
 
-        return Pair.of(body, 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Operation(summary = "Retrieve a task by ID.")
@@ -82,14 +84,14 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
     Pair<String, Integer> get(
-        Map<String, String> pathParams) throws Exception {
+        Map<String, String> pathParams) {
 
         String id = getId(pathParams);
 
         TaskWithId taskWitId = service.get(id);
         String body = json.toJsonString(json.toDto(taskWitId));
 
-        return Pair.of(body, 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
 }

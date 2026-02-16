@@ -63,7 +63,7 @@ public class BackEndStack extends Stack {
         table.grant(createLambda, "dynamodb:PutItem");
         table.grant(deleteLambda, "dynamodb:DeleteItem");
         table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
-        table.grant(updateLambda, "dynamodb:UpdateItem");
+        table.grant(updateLambda, "dynamodb:GetItem", "dynamodb:UpdateItem");
 
         List<AddRoutesOptions> routeOut = Arrays.asList(
             testRoute.build(testLambda, "ApiGatewayRouteToLambda0"),

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.frankz.hmcts.dts.service.Action;
-import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
 
 import static org.springframework.http.ResponseEntity.noContent;
@@ -24,17 +23,13 @@ public class DeleteTaskController {
     private final TaskService service;
 
     @Autowired
-    private final Mapper map;
-
-    @Autowired
-    public DeleteTaskController(TaskService service, Mapper mapper) {
+    public DeleteTaskController(TaskService service) {
         this.service = service;
-        this.map = mapper;
     }
 
     @Operation(summary = "Delete a Task by ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "202", description = "Task has been deleted successfully, or "
+        @ApiResponse(responseCode = "204", description = "Task has been deleted successfully, or "
             + "there was no task matching the provided id.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Technical exceptions.", content = @Content)
     })

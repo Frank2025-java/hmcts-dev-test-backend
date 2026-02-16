@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
@@ -24,6 +25,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public UpdateTaskHandler() {
         super();
     }
@@ -56,9 +58,9 @@ public class UpdateTaskHandler extends BaseTaskHandler
         String status = get(pathParams, Action.PARM.STATUS);
 
         TaskWithId taskWitId = service.update(id, status);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
-        return Pair.of(json.toJsonString(taskWitId), 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Operation(summary = "Update Task fields.")
@@ -79,9 +81,9 @@ public class UpdateTaskHandler extends BaseTaskHandler
     Pair<String, Integer> update(String requestBody) {
         TaskWithId task = json.toEntity(requestBody);
         TaskWithId taskWitId = service.update(task);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
-        return Pair.of(json.toJsonString(taskWitId), 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Override

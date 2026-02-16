@@ -194,7 +194,11 @@ we are not worried about integrating or smoke testing connections. The Functiona
 Smoke Tests for development. Integration and Smoke Tests will be useful for production.
 
 _CrudTaskFunctionalTest.java_ is runnable test, which starts up a Spring Boot for testing.
-By changing the TEST_URL, the test runs against Spring Boot backend, or against the AWS hosted backend.
+By changing the TEST_URL, the test runs against Spring Boot backend
+(see [screenshot](img/functional-test-results-springboot.png)),
+or against the AWS hosted backend (see [screenshot](img/functional-test-results-aws.png)).
+AWS lambdas have a typical cold startup of 10 seconds, for which there are ways to speed up
+which comes with a price tag.
 
 ## 🚀Deliverable
 The deliverable is a Spring Boot application packages in htmcts-dev-test-backend jar file,

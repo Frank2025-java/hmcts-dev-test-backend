@@ -13,7 +13,7 @@
       <AppenderRef ref="Console"/>
     </Logger>
 
-    <Logger name="software.amazon.awssdk" level="DEBUG" additivity="false">
+    <Logger name="software.amazon.awssdk" level="INFO" additivity="false">
       <AppenderRef ref="Console"/>
     </Logger>
 

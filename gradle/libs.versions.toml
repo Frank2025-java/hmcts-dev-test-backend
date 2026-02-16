@@ -1,11 +1,11 @@
 [versions]
-awssdk = "2.25.0"
-mockito = "5.11.0"
-jackson = "2.17.2"
+awssdk = "2.41.29"
+mockito = "5.21.0"
+jackson = "2.21.0"
 
 
 [plugins]
-shadow = { id = "com.gradleup.shadow", version = "9.0.0-rc2" }
+shadow = { id = "com.gradleup.shadow", version = "9.3.1" }
 
 # Applies analysis tools including checkstyle and OWASP Dependency checker.
 hmcts-check = { id = 'uk.gov.hmcts.java', version = '0.12.67' }
@@ -13,10 +13,10 @@ hmcts-check = { id = 'uk.gov.hmcts.java', version = '0.12.67' }
 [bundles]
 
 [libraries]
-lombok                  = { group = "org.projectlombok", name = "lombok", version = "1.18.32" }
+lombok                  = { group = "org.projectlombok", name = "lombok", version = "1.18.42" }
 
-jakarta-validation      = { group = "jakarta.validation", name = "jakarta.validation-api", version = "3.0.2" }
-swagger-annotations     = { group = "io.swagger.core.v3", name = "swagger-annotations", version = "2.2.22" }
+jakarta-validation      = { group = "jakarta.validation", name = "jakarta.validation-api", version = "3.1.1" }
+swagger-annotations     = { group = "io.swagger.core.v3", name = "swagger-annotations", version = "2.2.42" }
 
 commons-collection4     = { group = 'org.apache.commons', name = 'commons-collections4', version = "4.5.0" }
 commons-lang3           = { group = "org.apache.commons", name = "commons-lang3", version = "3.20.0" }
@@ -24,9 +24,9 @@ jackson-core            = { group = "com.fasterxml.jackson.core", name = "jackso
 jackson-databind        = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 jackson-jsr310          = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
 
-slf4j                   = { group = "org.slf4j", name = "slf4j-api", version = "2.0.12" }
-slf4j-log4j2            = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version = "2.23.1" }
-aws-lambda-log4j2       = { group = "com.amazonaws", name = "aws-lambda-java-log4j2", version = "1.6.0" }
+slf4j                   = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
+slf4j-log4j2            = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version = "2.25.3" }
+aws-lambda-log4j2       = { group = "com.amazonaws", name = "aws-lambda-java-log4j2", version = "1.6.2" }
 
 mockito-core            = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-junit           = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
@@ -42,6 +42,6 @@ aws-dynamobb            = { group = "software.amazon.awssdk", name = "dynamodb",
 aws-dynamobb-enh        = { group = "software.amazon.awssdk", name = "dynamodb-enhanced", version.ref = "awssdk" }
 aws-sts                 = { group = "software.amazon.awssdk", name = "sts", version.ref = "awssdk" }
 
-aws-cdk                 = { group = "software.amazon.awscdk", name = "aws-cdk-lib", version = "2.235.1" }
+aws-cdk                 = { group = "software.amazon.awscdk", name = "aws-cdk-lib", version = "2.238.0" }
 constructs              = { group = "software.constructs", name = "constructs", version = "[10.0.0,11.0.0)" }
 

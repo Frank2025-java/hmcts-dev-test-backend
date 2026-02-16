@@ -57,7 +57,7 @@ class MapperTest {
     @BeforeEach
     void setup() {
         // for convenience and testing the Jackson settings, use the real jackson json mapper
-        testSubject = new Mapper();
+        testSubject = new Mapper(real);
 
         testDto = new TaskDto();
         testDto.setId(TEST_ID.toString());

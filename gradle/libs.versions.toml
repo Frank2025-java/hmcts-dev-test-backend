@@ -1,8 +1,8 @@
 [versions]
 awssdk = "2.41.29"
 mockito = "5.21.0"
-jackson = "2.21.0"
-
+jackson2 = "2.21.0"
+jackson3 = "3.1.0-rc1"
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "9.3.1" }
@@ -20,9 +20,15 @@ swagger-annotations     = { group = "io.swagger.core.v3", name = "swagger-annota
 
 commons-collection4     = { group = 'org.apache.commons', name = 'commons-collections4', version = "4.5.0" }
 commons-lang3           = { group = "org.apache.commons", name = "commons-lang3", version = "3.20.0" }
-jackson-core            = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
-jackson-databind        = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
-jackson-jsr310          = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
+
+jackson2-core            = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson2" }
+jackson2-databind        = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson2" }
+jackson2-jsr310          = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson2" }
+
+jackson2-annotations    = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version = "2.21" }
+
+jackson3-core          = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson3" }
+jackson3-databind      = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson3" }
 
 slf4j                   = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
 slf4j-log4j2            = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version = "2.25.3" }

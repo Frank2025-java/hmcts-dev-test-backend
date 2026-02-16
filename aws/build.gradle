@@ -16,9 +16,9 @@ dependencies {
   implementation project(":common")
   implementation libs.jakarta.validation
   implementation libs.commons.lang3
-  implementation libs.jackson.core
-  implementation libs.jackson.databind
-  implementation libs.jackson.jsr310
+  implementation libs.jackson3.core
+  implementation libs.jackson3.databind
+  implementation libs.jackson2.annotations
   implementation libs.aws.lambda.core
   implementation libs.aws.lambda.events
   implementation libs.aws.dynamobb
@@ -56,8 +56,7 @@ shadowJar {
 
   manifest {
     attributes("Implementation-Title": group,
-      "Implementation-Version": version,
-      "Main-Class": mainClassName)
+      "Implementation-Version": version)
   }
 
   mergeServiceFiles()   // SLF4J provider

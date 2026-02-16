@@ -1,10 +1,9 @@
 package uk.co.frankz.hmcts.dts.aws;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.io.JsonEOFException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Status;
@@ -42,23 +41,23 @@ class MapperTest {
     static final String JACKSON_NEWLINE = System.lineSeparator();
 
     static final String TEST_JSON = "{" + JACKSON_NEWLINE
-        + "  \"id\" : \"" + TEST_ID + "\"," + JACKSON_NEWLINE
-        + "  \"title\" : \"" + TEST_TITLE + "\"," + JACKSON_NEWLINE
-        + "  \"description\" : \"" + TEST_DESC + "\"," + JACKSON_NEWLINE
-        + "  \"status\" : \"" + TEST_STATUS + "\"," + JACKSON_NEWLINE
-        + "  \"due\" : \"" + TEST_TIME_STR + "\"" + JACKSON_NEWLINE
+        + "  \"description\" : \"" + TEST_DESC + "\"" + "," + JACKSON_NEWLINE
+        + "  \"due\" : \"" + TEST_TIME_STR + "\"" + "," + JACKSON_NEWLINE
+        + "  \"id\" : \"" + TEST_ID + "\"" + "," + JACKSON_NEWLINE
+        + "  \"status\" : \"" + TEST_STATUS + "\"" + "," + JACKSON_NEWLINE
+        + "  \"title\" : \"" + TEST_TITLE + "\"" + JACKSON_NEWLINE
         + "}";
 
     TaskWithId testTask;
 
     TaskDto testDto;
 
-    ObjectMapper real = new ObjectMapper();
+    JsonMapper real = Mapper.JACKSON;
 
     @BeforeEach
     void setup() {
         // for convenience and testing the Jackson settings, use the real jackson json mapper
-        testSubject = new Mapper();
+        testSubject = new Mapper(real);
 
         testDto = new TaskDto();
         testDto.setId(TEST_ID.toString());
@@ -172,11 +171,11 @@ class MapperTest {
     }
 
     @Test
-    void shouldPropagateExceptionOnCreateJsonStringFromDto() throws JsonProcessingException {
+    void shouldPropagateExceptionOnCreateJsonStringFromDto() throws JacksonException {
         // given
-        ObjectMapper mockJackson = mock(ObjectMapper.class);
+        JsonMapper mockJackson = mock(JsonMapper.class);
         Mapper testSubjectMocked = new Mapper(mockJackson);
-        JsonProcessingException givenEx = mock(JsonEOFException.class);
+        JacksonException givenEx = mock(JacksonException.class);
         when(mockJackson.writeValueAsString(any())).thenThrow(givenEx);
 
         // when

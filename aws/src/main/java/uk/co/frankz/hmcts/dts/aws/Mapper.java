@@ -1,16 +1,18 @@
 package uk.co.frankz.hmcts.dts.aws;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.ArrayUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Task;
 import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskJsonException;
 
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -23,16 +25,15 @@ import java.util.UUID;
  */
 public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
 
-    public static final ObjectMapper JACKSON = new ObjectMapper();
+    public static final JsonMapper JACKSON = JsonMapper.builder()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .defaultTimeZone(TimeZone.getDefault())
+        .disable(DateTimeFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS)
+        .enable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+        .build();
 
-    static {
-        JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
-        JACKSON.registerModule(new JavaTimeModule());
-        JACKSON.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        JACKSON.enable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE);
-    }
-
-    private final ObjectMapper json;
+    private final JsonMapper json;
 
     public Mapper() {
         this(JACKSON);
@@ -43,7 +44,7 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
      *
      * @param json Jackson ObjectMapper instance
      */
-    Mapper(ObjectMapper json) {
+    Mapper(JsonMapper json) {
         this.json = json;
     }
 
@@ -70,7 +71,7 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
 
         try {
             return json.readValue(string, TaskDto.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new TaskJsonException("Parsing into TaskDto: " + string, e);
         }
     }
@@ -109,7 +110,7 @@ public class Mapper extends uk.co.frankz.hmcts.dts.dto.Mapper {
 
         try {
             return json.writeValueAsString(dto);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new TaskJsonException("Formating TaskDto: " + dto, e);
         }
     }

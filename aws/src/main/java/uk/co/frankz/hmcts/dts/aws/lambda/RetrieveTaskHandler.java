@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.tuple.Pair;
+import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
@@ -89,7 +90,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         TaskWithId taskWitId = service.get(id);
         String body = json.toJsonString(json.toDto(taskWitId));
 
-        return Pair.of(body, 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
 }

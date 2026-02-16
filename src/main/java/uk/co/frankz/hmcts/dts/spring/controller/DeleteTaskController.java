@@ -34,7 +34,7 @@ public class DeleteTaskController {
 
     @Operation(summary = "Delete a Task by ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "202", description = "Task has been deleted successfully, or "
+        @ApiResponse(responseCode = "204", description = "Task has been deleted successfully, or "
             + "there was no task matching the provided id.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Technical exceptions.", content = @Content)
     })

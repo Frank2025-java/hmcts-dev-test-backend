@@ -4,12 +4,23 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.service.Header;
 
+import static software.amazon.awssdk.http.HttpStatusCode.BAD_REQUEST;
+import static software.amazon.awssdk.http.HttpStatusCode.INTERNAL_SERVER_ERROR;
+
 public class TaskExceptionHandler {
 
+    /**
+     * On an error, HTML is prepared with some feedback.
+     * The HTTP status code is 400 for a application wrapped exception
+     * and a 500 for an exception that was not wrapped, so not expected.
+     *
+     * @param e        exception
+     * @param response is a html page with some feedback
+     */
     public static void setErrorOnResponse(Exception e, APIGatewayV2HTTPResponse response) {
 
         String message = TaskException.toString(e);
-        int statusCode = e instanceof TaskException ? 400 : 500;
+        int statusCode = e instanceof TaskException ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
 
         response.setBody(body(message));
         response.setStatusCode(statusCode);

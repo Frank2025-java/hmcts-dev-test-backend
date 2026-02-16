@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
-import uk.co.frankz.hmcts.dts.spring.Mapper;
 import uk.co.frankz.hmcts.dts.spring.TaskService;
 import uk.co.frankz.hmcts.dts.spring.TaskWithId;
 
@@ -30,9 +29,6 @@ class DeleteTaskControllerTest {
     @Mock
     TaskService mockService;
 
-    @Mock
-    Mapper mockMapper;
-
     @Captor
     ArgumentCaptor<TaskWithId> taskCaptor;
 
@@ -40,7 +36,7 @@ class DeleteTaskControllerTest {
 
     @BeforeEach
     void setup() {
-        testSubject = new DeleteTaskController(mockService, mockMapper);
+        testSubject = new DeleteTaskController(mockService);
     }
 
     @Test

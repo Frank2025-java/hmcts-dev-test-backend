@@ -25,6 +25,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public UpdateTaskHandler() {
         super();
     }
@@ -59,7 +60,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         TaskWithId taskWitId = service.update(id, status);
         String body = json.toJsonString(json.toDto(taskWitId));
 
-        return Pair.of(json.toJsonString(taskWitId), HttpStatusCode.OK);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Operation(summary = "Update Task fields.")
@@ -82,7 +83,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         TaskWithId taskWitId = service.update(task);
         String body = json.toJsonString(json.toDto(taskWitId));
 
-        return Pair.of(json.toJsonString(taskWitId), HttpStatusCode.OK);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Override

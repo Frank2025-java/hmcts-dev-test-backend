@@ -26,6 +26,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public RetrieveTaskHandler() {
         super();
     }
@@ -66,13 +67,13 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "400", description = "No tasks.", content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
-    Pair<String, Integer> getAll() throws Exception {
+    Pair<String, Integer> getAll() {
 
         Stream<TaskWithId> tasks = service.getAll();
         TaskDto[] dtos = json.toDto(tasks);
         String body = json.toJsonString(dtos);
 
-        return Pair.of(body, 200);
+        return Pair.of(body, HttpStatusCode.OK);
     }
 
     @Operation(summary = "Retrieve a task by ID.")
@@ -83,7 +84,7 @@ public class RetrieveTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
     Pair<String, Integer> get(
-        Map<String, String> pathParams) throws Exception {
+        Map<String, String> pathParams) {
 
         String id = getId(pathParams);
 

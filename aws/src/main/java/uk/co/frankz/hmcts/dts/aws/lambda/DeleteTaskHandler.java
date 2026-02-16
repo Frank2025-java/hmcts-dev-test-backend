@@ -22,6 +22,7 @@ public class DeleteTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public DeleteTaskHandler() {
         super();
     }

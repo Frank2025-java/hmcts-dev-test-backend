@@ -24,12 +24,8 @@ public class DeleteTaskController {
     private final TaskService service;
 
     @Autowired
-    private final Mapper map;
-
-    @Autowired
-    public DeleteTaskController(TaskService service, Mapper mapper) {
+    public DeleteTaskController(TaskService service) {
         this.service = service;
-        this.map = mapper;
     }
 
     @Operation(summary = "Delete a Task by ID.")

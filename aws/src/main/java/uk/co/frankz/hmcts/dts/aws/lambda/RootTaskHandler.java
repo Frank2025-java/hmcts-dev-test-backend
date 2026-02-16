@@ -21,6 +21,7 @@ public class RootTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public RootTaskHandler() {
         super();
     }

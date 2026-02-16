@@ -24,6 +24,7 @@ public class CreateTaskHandler extends BaseTaskHandler
     /**
      * Required constructor for the Lambda getting initialised. A so-called warm container constructor.
      */
+    @SuppressWarnings("unused")
     public CreateTaskHandler() {
         super();
     }
@@ -53,8 +54,8 @@ public class CreateTaskHandler extends BaseTaskHandler
 
         TaskWithId task = json.toEntity(request);
         TaskWithId taskWitId = service.createTask(task);
-        String body = json.toJsonString(json.toDto(taskWitId));
+        String body = json.toJsonString(taskWitId);
 
-        return Pair.of(json.toJsonString(taskWitId), HttpStatusCode.CREATED);
+        return Pair.of(body, HttpStatusCode.CREATED);
     }
 }

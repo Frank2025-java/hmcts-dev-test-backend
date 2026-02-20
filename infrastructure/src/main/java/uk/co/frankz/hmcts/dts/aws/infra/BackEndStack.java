@@ -15,6 +15,7 @@ import software.constructs.Construct;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.anyHeaderRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiDomainBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.apiLogBuilder;
@@ -29,12 +30,11 @@ import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.retrieveTaskBuil
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.tableBuilder;
-import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.testBuilder;
-import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.testRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateStatusRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.MyEnvironment.awsDefaultProfile;
+import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.FRONTEND_CORS_ORIGINS;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.SUBDOMAIN_NAME;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.SUBDOMAIN_PREFIX;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.certFinder;
@@ -56,9 +56,6 @@ public class BackEndStack extends Stack {
         Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
         Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
 
-        Function testLambda = testBuilder.build(this, "TestLambda");
-        table.grantReadWriteData(testLambda);
-
         table.grant(defaultLambda, "dynamodb:DescribeTable");
         table.grant(createLambda, "dynamodb:PutItem");
         table.grant(deleteLambda, "dynamodb:DeleteItem");
@@ -66,7 +63,7 @@ public class BackEndStack extends Stack {
         table.grant(updateLambda, "dynamodb:GetItem", "dynamodb:UpdateItem");
 
         List<AddRoutesOptions> routeOut = Arrays.asList(
-            testRoute.build(testLambda, "ApiGatewayRouteToLambda0"),
+            anyHeaderRoute.build(defaultLambda, "ApiGatewayRouteToLambda0"),
             rootRoute.build(defaultLambda, "ApiGatewayRouteToLambda1"),
             createRoute.build(createLambda, "ApiGatewayRouteToLambda2"),
             deleteRoute.build(deleteLambda, "ApiGatewayRouteToLambda3"),
@@ -79,7 +76,8 @@ public class BackEndStack extends Stack {
         ICertificate cert = certFinder.find(this);
         DomainName subDomain = apiDomainBuilder.build(this, "MySubDomain", SUBDOMAIN_NAME, cert);
 
-        HttpApi api = apiBuilder.build(this, "MyApi", subDomain);
+        var cors = new CrossOriginResourcesBuilder().build(this, "MyCors", FRONTEND_CORS_ORIGINS);
+        HttpApi api = apiBuilder.build(this, "MyApiWithCors", subDomain, cors);
         LogGroup accessLog = apiLogBuilder.build(this, "MyApiLog");
         CfnStage defaultStage = apiBuilder.buildStage(this, "MyApiDefaultStage", api, accessLog);
         apiBuilder.buildMap(this, "MyBasePathMap", api, subDomain, "task", defaultStage);

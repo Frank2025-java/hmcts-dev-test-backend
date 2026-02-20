@@ -79,6 +79,7 @@ hmcts-dev-test-backend/
     │   │   │      │   ├── dynamodb/                      # AWS DynamoDb database specifics
     │   │   │      │   │   ├── TaskWithId.java            # Entity with annotation gating id
     │   │   │      │   │   ├── TaskStoreImpl.java         # CRUD implementation for persistence
+    │   │   │      │   │   ├── BaseConvertor.java         # convertor abstract class
     │   │   │      │   │   ├── StatusConverter.java       # convertor for Status enum
     │   │   │      │   │   ├── AutoUuidConverter.java     # convertor for UUID
     │   │   │      │   │   └── IsoDateTimeConverter.java  # convertor for ISO string of LocalDateTime
@@ -94,22 +95,32 @@ hmcts-dev-test-backend/
     ├── src/
     │   ├── main/
     │   │   ├── java/
-    │   │   │   └── uk/co/frankz/hmcts/dts/spring/        # Implementation with Spring annotations
-    │   │   │        ├── controller/                      # Spring Controllers for REST API
-    │   │   │        │   ├── RootController.java
-    │   │   │        │   ├── RootTaskController.java
-    │   │   │        │   ├── CreateTaskController.java
-    │   │   │        │   ├── DeleteTaskController.java
-    │   │   │        │   ├── UpdateTaskController.java
-    │   │   │        │   └── RetrieveTaskController.java
-    │   │   │        ├── Mapper.java                      # Convertor between dto - entity/id (Spring)
-    │   │   │        ├── TaskStore.java                   # CRUD impl Spring adaptor for Eclipse Store
-    │   │   │        ├── TaskWithId.java                  # Task representing entity with id (Spring)
-    │   │   │        ├── Application.java                 # Runnable Spring Boot application class
-    │   │   │        ├── TaskService.java                 # CRUD logic for task with id (Spring managed)
-    │   │   │        ├── TaskExceptionHandler.java        # Spring Controller Exception
-    │   │   │        ├── RepositoryHealthIndicator.java   # Logic to check whether app should work
-    │   │   │        └── TaskStoreEclipseStoreConfig.java # Configuration Spring adaptor for EclipseStore
+    │   │   │   ├── uk/co/frankz/hmcts/dts/spring/        # Implementation with Spring annotations
+    │   │   │   │    ├── controller/                      # Spring Controllers for REST API
+    │   │   │   │    │   ├── RootController.java
+    │   │   │   │    │   ├── RootTaskController.java
+    │   │   │   │    │   ├── CreateTaskController.java
+    │   │   │   │    │   ├── DeleteTaskController.java
+    │   │   │   │    │   ├── UpdateTaskController.java
+    │   │   │   │    │   └── RetrieveTaskController.java
+    │   │   │   │    ├── Mapper.java                      # Convertor between dto - entity/id (Spring)
+    │   │   │   │    ├── TaskStore.java                   # CRUD impl Spring adaptor for Eclipse Store
+    │   │   │   │    ├── TaskWithId.java                  # Task representing entity with id (Spring)
+    │   │   │   │    ├── GlobalCorsConfig.java            # Spring CORS config
+    │   │   │   │    ├── Application.java                 # Runnable Spring Boot application class
+    │   │   │   │    ├── TaskService.java                 # CRUD logic for task with id (Spring managed)
+    │   │   │   │    ├── TaskExceptionHandler.java        # Spring Controller Exception
+    │   │   │   │    ├── RepositoryHealthIndicator.java   # Logic to check whether app should work
+    │   │   │   │    └── TaskStoreEclipseStoreConfig.java # Configuration Spring adaptor for EclipseStore
+    │   │   │   │
+    │   │   │   └── uk/gov/hmcts/reform/dev/
+    │   │   │       ├── models/
+    │   │   │       │   └── ExampleCase.java              # Demo response
+    │   │   │       ├── controllers/
+    │   │   │       │   ├── CaseController.java           # Demo service
+    │   │   │       │   └── RootController.java
+    │   │   │       ├── Application.java                  # Demo app running on port 4000, for Frontend demo
+    │   │   │       └── GlobalCorsConfig.java             # CORS support added for frontend
     │   │   │
     │   │   └── resources/
     │   │       └── application.yaml                      # Spring Boot properties, shared with HMCTS Demo
@@ -159,19 +170,20 @@ hmcts-dev-test-backend/
     │   └── src/
     │       ├── main/
     │       │   ├── java/uk/co/frankz/hmcts/dts/aws/infra/ # Infrastructure as (java) code for AWS components
+    │       │   │    ├── CloudAssemblerApplication.java    # Application to start generating components
     │       │   │    ├── BackEndStack.java                 # Logic to generate all components for the app
-    │       │   │    ├── TableBuilder.java                 # Logic to generate a DynamoDb table
-    │       │   │    ├── LambdaBuilder.java                # Logic to generate a Serverless Function (AWS Lambda)
+    │       │   │    ├── BackEndComponent.java             # List of variables of components to generate
+    │       │   │    ├── ProvisionedComponent.java         # List of variables of provisioned components
     │       │   │    ├── MyEnvironment.java                # AWS and CDK (local) environment settings
+    │       │   │    ├── LambdaBuilder.java                # Logic to generate a Serverless Function (AWS Lambda)
     │       │   │    ├── DnsEntryBuilder.java              # Logic to generate a DNS entry (AWS Route53 entry)
     │       │   │    ├── LogGroupBuilder.java              # Logic to generate a Log location
-    │       │   │    ├── BackEndComponent.java             # List of variables of components to generate
     │       │   │    ├── SubDomainBuilder.java             # Logic to generate a sub domain for API Gateway
     │       │   │    ├── ApiGatewayBuilder.java            # Logic to generate AWS API Gateway component
     │       │   │    ├── LambdaRouteBuilder.java           # Logic to generate link API Gateway to Lambda
     │       │   │    ├── SubDomainCertFinder.java          # Logic to generate code to lookup the certificate
-    │       │   │    ├── ProvisionedComponent.java         # List of variables of provisioned components
-    │       │   │    └── CloudAssemblerApplication.java    # Application to start generating components
+    │       │   │    ├── TableBuilder.java                 # Logic to generate a DynamoDb table
+    │       │   │    └── CrossOriginResourcesBuilder.java  # CORS support
     │       │   └── resources
     │       └── test/
     │           ├── java
@@ -348,6 +360,9 @@ Then I spend many days to find out that the shadowJar that I produced contained 
 libraries that causes a not responding lambda. Those libraries load during invocation, causing a timeout
 after 10 seconds. That made me splitting up the code in separate IDE/Gradle modules, so that controlling
 what is in a shadowJar, is easier.
+
+When I started developing the frontend, I noticed that the backend needs CORS support, which has been added
+for Spring Boot apps and AWS Api Gateway.
 
 ## ✉ Acknowledgement and Support
 Contact mailto:frankz@iae.nl for support.

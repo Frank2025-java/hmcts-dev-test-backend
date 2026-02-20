@@ -2,6 +2,7 @@ package uk.co.frankz.hmcts.dts.aws.infra;
 
 import software.amazon.awscdk.services.apigatewayv2.CfnApiMapping;
 import software.amazon.awscdk.services.apigatewayv2.CfnStage;
+import software.amazon.awscdk.services.apigatewayv2.CorsPreflightOptions;
 import software.amazon.awscdk.services.apigatewayv2.DomainName;
 import software.amazon.awscdk.services.apigatewayv2.HttpApi;
 import software.amazon.awscdk.services.apigatewayv2.HttpApiProps;
@@ -25,13 +26,15 @@ public class ApiGatewayBuilder {
      * @param scope     of construct
      * @param id        as CDK identifier in the generated asset files
      * @param apiDomain reference to the subdomain for this api gateway
+     * @param cors      the allowed origins of a browser CORS request
      * @return instance of the level 2 CDK construct for ApiGateway of type Http API
      */
-    public HttpApi build(Construct scope, String id, DomainName apiDomain) {
+    public HttpApi build(Construct scope, String id, DomainName apiDomain, CorsPreflightOptions cors) {
 
         HttpApiProps props = HttpApiProps.builder()
             .apiName(displayName)
             .createDefaultStage(false)
+            .corsPreflight(cors)
             .build();
 
         return new HttpApi(scope, id, props);

@@ -17,13 +17,17 @@ public class LambdaRouteBuilder {
 
     private final String resourcePath;
 
-    private final HttpMethod httpMethod;
+    private final List<HttpMethod> httpMethods;
 
     private final HttpLambdaIntegrationProps version2;
 
     public LambdaRouteBuilder(String resourcePath, HttpMethod httpMethod) {
+        this(resourcePath, new HttpMethod[]{httpMethod});
+    }
+
+    public LambdaRouteBuilder(String resourcePath, HttpMethod... httpMethods) {
         this.resourcePath = resourcePath;
-        this.httpMethod = httpMethod;
+        this.httpMethods = List.of(httpMethods);
 
         this.version2 = HttpLambdaIntegrationProps.builder().payloadFormatVersion(VERSION_2_0).build();
     }
@@ -42,7 +46,7 @@ public class LambdaRouteBuilder {
         return AddRoutesOptions
             .builder()
             .path(resourcePath)
-            .methods(List.of(httpMethod))
+            .methods(httpMethods)
             .integration(httpApiIntegrate)
             .build();
     }

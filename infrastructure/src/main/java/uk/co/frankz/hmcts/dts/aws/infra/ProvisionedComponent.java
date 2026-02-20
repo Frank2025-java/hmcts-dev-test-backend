@@ -18,4 +18,11 @@ public interface ProvisionedComponent {
     String SUBDOMAIN_CERT_ARN = "arn:aws:acm:eu-west-1:624325726410:certificate/fe385a47-e2d4-4c52-b55e-dd9c1769dcf0";
 
     SubDomainCertFinder certFinder = new SubDomainCertFinder(SUBDOMAIN_PREFIX, SUBDOMAIN_CERT_ARN);
+
+    String[] FRONTEND_CORS_ORIGINS = {
+        "https://www.frankz.co.uk",
+        "https://frankz.co.uk",
+        "https://api.frankz.co.uk",
+        "https://localhost:3100"
+    };
 }

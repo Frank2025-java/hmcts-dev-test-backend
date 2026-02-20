@@ -4,6 +4,7 @@ import uk.co.frankz.hmcts.dts.service.Action;
 
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.DELETE;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.GET;
+import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.HEAD;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.POST;
 import static software.amazon.awscdk.services.apigatewayv2.HttpMethod.PUT;
 import static uk.co.frankz.hmcts.dts.aws.infra.ProvisionedComponent.DOMAIN;
@@ -40,20 +41,16 @@ public interface BackEndComponent {
         "uk.co.frankz.hmcts.dts.aws.lambda.RootTaskHandler"
     );
 
-    LambdaBuilder testBuilder = new LambdaBuilder(
-        "Test",
-        "functions.jar",
-        "uk.co.frankz.hmcts.dts.aws.lambda.DynamoDbTestHandler"
-    );
-
     LambdaRouteBuilder createRoute = new LambdaRouteBuilder(Action.PATH.CREATE, POST);
     LambdaRouteBuilder deleteRoute = new LambdaRouteBuilder(Action.PATH.DELETE, DELETE);
     LambdaRouteBuilder getRoute = new LambdaRouteBuilder(Action.PATH.GET, GET);
     LambdaRouteBuilder getAllRoute = new LambdaRouteBuilder(Action.PATH.GET_ALL, GET);
     LambdaRouteBuilder updateRoute = new LambdaRouteBuilder(Action.PATH.UPDATE, POST);
     LambdaRouteBuilder updateStatusRoute = new LambdaRouteBuilder(Action.PATH.UPDATE_STATUS, PUT);
-    LambdaRouteBuilder rootRoute = new LambdaRouteBuilder(Action.PATH.ROOT, GET);
-    LambdaRouteBuilder testRoute = new LambdaRouteBuilder("/test", GET);
+    LambdaRouteBuilder rootRoute = new LambdaRouteBuilder(Action.PATH.ROOT, GET, HEAD);
+
+    // support for CORS Headers
+    LambdaRouteBuilder anyHeaderRoute = new LambdaRouteBuilder("/{proxy+}", HEAD);
 
     ApiGatewayBuilder apiBuilder = new ApiGatewayBuilder("LambdaApi");
 

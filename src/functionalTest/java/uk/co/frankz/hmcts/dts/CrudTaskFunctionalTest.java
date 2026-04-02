@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,18 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(OrderAnnotation.class)
 class CrudTaskFunctionalTest {
 
-    protected static final String CONTENT_TYPE_VALUE = "application/json";
-
     private static final Logger LOG = LoggerFactory.getLogger(CrudTaskFunctionalTest.class);
 
     public static final String ANSI_PURPLE = "\u001B[35m";
 
     private static void log(String msg) {
         LOG.info(ANSI_PURPLE + msg);
-        ;
     }
 
-    @Value("${TEST_URL:https://api.frankz.co.uk}")
+    @Value("${TEST_URL:http://localhost:4000}")
+    @SuppressWarnings("unused")
     private String testUrl;
 
     static TaskDto testTaskInMemory;
@@ -134,7 +131,7 @@ class CrudTaskFunctionalTest {
 
     @Test
     @Order(3)
-    void shouldUpdateStatus() throws JSONException {
+    void shouldUpdateStatus() {
         String testTaskId = testTaskInMemory.getId();
         String testStatus = Status.Deleted.name();
 

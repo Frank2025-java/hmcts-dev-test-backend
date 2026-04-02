@@ -19,7 +19,7 @@ java {
   }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
   options.release = 17
 }
@@ -64,7 +64,7 @@ configurations {
   smokeTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
@@ -73,7 +73,7 @@ tasks.withType(JavaExec).configureEach {
   javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
   useJUnitPlatform()
 
   testLogging {
@@ -142,18 +142,12 @@ dependencyCheck {
   suppressionFile = 'config/owasp/suppressions.xml'
 }
 
-repositories {
-  mavenLocal()
-  mavenCentral()
-  maven { url 'https://jitpack.io' }
-}
-
-allprojects {
+allprojects  {
   repositories {
+    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
   }
-  group = rootProject.group
-  version = rootProject.version
 }
 
 ext {
@@ -194,7 +188,9 @@ dependencies {
 }
 
 //mainClassName = 'uk.gov.hmcts.reform.dev.Application'
-mainClassName = 'uk.co.frankz.hmcts.dts.spring.Application'
+application {
+  mainClass = 'uk.co.frankz.hmcts.dts.spring.Application'
+}
 
 bootJar {
   archiveFileName = "test-backend.jar"

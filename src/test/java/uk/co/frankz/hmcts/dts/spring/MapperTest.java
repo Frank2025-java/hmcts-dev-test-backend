@@ -7,12 +7,16 @@ import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapperTest {
 
@@ -188,6 +192,36 @@ class MapperTest {
 
         // then
         assertEquals(given.size(), actual.length);
+    }
+
+    @Test
+    void shouldDropTimeZoneRegion() {
+        // given
+        String givenZoneIn = "Europe/Samara";
+        String localTimeIn = "2026-04-05T02:11:30";
+        String zonedDueIn = localTimeIn + "+04:30[" + givenZoneIn + "]";
+        TaskDto givenIn = new TaskDto();
+        givenIn.setDue(ZonedDateTime.parse(zonedDueIn));
+
+        String expectedLocalDate = "2026-04-04";
+        ZoneId expectedZone = ZoneId.systemDefault();
+
+        // when
+        ZonedDateTime actualDue = testSubject.toDto(testSubject.toEntity(givenIn)).getDue();
+
+        // then
+        assertNotEquals(givenZoneIn, expectedZone.toString());
+        assertEquals(expectedZone, actualDue.getZone());
+        assertContains(actualDue.toString(), expectedLocalDate);
+        assertContains(actualDue.toString(), expectedZone.toString());
+    }
+
+    static void assertContains(String text, String substring) {
+        assertNotNull(text);
+        assertTrue(
+            text.contains(substring),
+            () -> "Expected text to contain <" + substring + "> but was <" + text + ">"
+        );
     }
 
 }

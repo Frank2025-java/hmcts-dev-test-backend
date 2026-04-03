@@ -364,5 +364,9 @@ what is in a shadowJar, is easier.
 When I started developing the frontend, I noticed that the backend needs CORS support, which has been added
 for Spring Boot apps and AWS Api Gateway.
 
+And I also discovered I had to choose ZonedDateTime instead of the CoPilot advised LocalDateTime,
+for the Data Transfer object, to allow run in a Cloud with an unknown default time zone.
+
+
 ## ✉ Acknowledgement and Support
 Contact mailto:frankz@iae.nl for support.

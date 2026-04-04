@@ -6,7 +6,11 @@ import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.Task;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +58,7 @@ public class MapperTest {
         TaskDto given = new TaskDto();
         given.setId(TEST_ID);
         given.setDescription("ddd");
-        LocalDateTime givenTime = LocalDateTime.parse("2025-12-18T16:45:30");
+        ZonedDateTime givenTime = ZonedDateTime.parse("2025-12-18T16:45:30Z");
         given.setDue(givenTime);
         given.setTitle("t");
         given.setStatus("Deleted");
@@ -66,11 +70,65 @@ public class MapperTest {
         assertEqual(given, actual);
     }
 
+    @Test
+    void shouldConvertTaskDtoToTaskAndBackWithTimeZone() {
+
+        // given
+        TaskDto given = new TaskDto();
+        ZonedDateTime givenTime = ZonedDateTime.parse("2025-12-18T16:45:30-02:00");
+        given.setDue(givenTime);
+
+        // when
+        TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
+
+        // then
+        assertEqual(given, actual);
+    }
+
+    @Test
+    void shouldConvertTaskDtoToTaskAndBackWithTimeZoneAndRegion() {
+
+        // given
+        TaskDto given = new TaskDto();
+        ZonedDateTime givenTime = ZonedDateTime.parse("2025-12-18T16:45:30+02:00[Europe/Amsterdam]");
+        given.setDue(givenTime);
+
+        // when
+        TaskDto actual = testSubject.toDto(testSubject.toEntity(given));
+
+        // then
+        assertEqual(given, actual);
+    }
+
+    @Test
+    void shouldConvertTaskToTaskDtoWithTimeZoneAndRegion() {
+
+        // given
+        Task given = new Task();
+        String givenDateTimeStr = "2026-04-18T16:45:30";
+        LocalDateTime givenTime = LocalDateTime.parse(givenDateTimeStr);
+        given.setDue(givenTime);
+
+        ZoneId expectedZone = ZoneId.systemDefault();
+        ZoneOffset expectedOffset = expectedZone.getRules().getOffset(Instant.now());
+        String expectedZoneAndRegion = expectedOffset + "[" + expectedZone + "]";
+        String expected = givenDateTimeStr + expectedZoneAndRegion;
+
+        // when
+        String actual = testSubject.toDto(given).getDue().toString();
+
+        // then
+        assertEquals(expected, actual);
+    }
+
+
     protected void assertEqual(TaskDto given, TaskDto actual) {
         assertEquals(given.getStatus(), actual.getStatus());
         assertEquals(given.getDescription(), actual.getDescription());
         assertEquals(given.getTitle(), actual.getTitle());
-        assertEquals(given.getDue(), actual.getDue());
+        Instant givenDue = given.getDue() == null ? null : given.getDue().toInstant();
+        Instant actualDue = actual.getDue() == null ? null : actual.getDue().toInstant();
+        assertEquals(givenDue, actualDue);
     }
 
     protected void assertEqual(Task given, Task actual) {

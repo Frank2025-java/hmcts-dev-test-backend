@@ -1,0 +1,90 @@
+plugins {
+    id 'base'   // gives you clean, assemble, build — without Java
+}
+
+description = "CDK execution environment (no Java code)"
+
+build {
+    description = "Build Lambda and CDK jars into the assets root directory"
+
+    dependsOn(":aws:shadowJar")
+    dependsOn(":infrastructure:shadowJar")
+}
+
+
+tasks.register("awsSSO", Exec) {
+    group = "aws"
+    description = "Checks whether AWS SSO login is active"
+
+    def stdout = new ByteArrayOutputStream()
+    def stderr = new ByteArrayOutputStream()
+
+    commandLine "aws", "sts", "get-caller-identity"
+    ignoreExitValue = true
+
+    standardOutput = stdout
+    errorOutput = stderr
+
+    doLast {
+      def exit = executionResult.get().exitValue
+
+      def out = stdout.toString()
+      def err = stderr.toString()
+      println "\u001B[32m" + out
+      println "\u001B[31m" + err
+      println "\u001B[0m"
+
+      if (exit == 0) {
+         return
+      }
+
+      def awsProfile = new ProcessBuilder("aws", "configure", "list")
+        .inheritIO()
+        .start()
+
+      def awsProfileOut = awsProfile.inputStream.text
+      awsProfile.waitFor()
+
+
+      if (err.contains("Token has expired and refresh failed")
+      ||  err.contains("Error loading SSO Token: Token for my-sso does not exist")) {
+
+        new ProcessBuilder("aws", "sso", "login")
+            .redirectErrorStream(true)
+            .start()
+
+        throw new GradleException("Please login to AWS default profile!" +
+          "\n\u001B[33m" + awsProfileOut +
+          "\n" +
+          "\n\u001B[1mOpening dialog ... ")
+      }
+
+      throw new GradleException(err.trim())
+    }
+}
+
+tasks.register("synth", Exec) {
+  group = "cdk"
+  description = "Run CDK using the command defined in cdk.json"
+
+  dependsOn("build")
+  dependsOn("awsSSO")
+
+  def npmBin = System.getenv("APPDATA") + "/npm"
+  workingDir = file("${project.rootDir}/assets")
+  commandLine "${npmBin}/cdk.cmd", "synth"
+}
+
+
+tasks.register("deploy", Exec) {
+  group = "cdk"
+  description = "Run CDK using the command defined in cdk.json"
+
+  dependsOn("synth")
+
+  def npmBin = System.getenv("APPDATA") + "/npm"
+  workingDir = file("${project.rootDir}/assets")
+  commandLine "${npmBin}/cdk.cmd", "deploy"
+}
+
+

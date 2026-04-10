@@ -6,7 +6,11 @@ options for hosting in the cloud.
 
 Next to develop is a Lambda backend next to the Spring Boot.
 
-We leave it up to the Stakeholders to decide what would be commercial the best technology.
+The basis of this product cloned from
+[hmcts/hmcts-dev-test-backend](https://github.com/hmcts/hmcts-dev-test-backend),
+who invited us to come up with a creative solution.
+So, here I left it up to the Stakeholders to decide what would be
+commercial the best technology between a Spring Boot and serverless AWS solution.
 The AWS Lambda technology tends to be very low-cost and low-maintenance, although
 hosting a docker image with the Spring Boot application usually is also accepted as
 a good low-cost option.

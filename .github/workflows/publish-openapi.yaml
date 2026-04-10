@@ -27,4 +27,4 @@ jobs:
           distribution: temurin
 
       - name: Run my OpenAPI test
-        run: ./gradlew integration --tests uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest
+        run: ./gradlew integration --info --tests uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest --rerun-tasks

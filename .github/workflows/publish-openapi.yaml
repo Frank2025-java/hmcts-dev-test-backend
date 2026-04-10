@@ -1,14 +1,37 @@
-name: Publish OpenAPI specs
+#name: Publish OpenAPI specs
+name: Print and Upload OpenAPI specs
 on:
   push:
     branches:
-      - "master"
+#      - "master"
+       - "**"
 
 jobs:
-  publish-openapi:
-    uses: hmcts/workflow-publish-openapi-spec/.github/workflows/publish-openapi.yml@v1
-    secrets:
-      SWAGGER_PUBLISHER_API_TOKEN: ${{ secrets.SWAGGER_PUBLISHER_API_TOKEN }}
-    with:
-      test_to_run: 'uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest'
-      java_version: 17
+  #publish-openapi:
+  #  uses: hmcts/workflow-publish-openapi-spec/.github/workflows/publish-openapi.yml@v1
+  #  secrets:
+  #    SWAGGER_PUBLISHER_API_TOKEN: ${{ secrets.SWAGGER_PUBLISHER_API_TOKEN }}
+  #  with:
+  #    test_to_run: 'uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest'
+  #    java_version: 17
+  run-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Run my OpenAPI test
+        run: ./gradlew integration --rerun --tests uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest --info
+
+      - name: Upload OpenAPI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: build/openapi/openapi-spec.json
+

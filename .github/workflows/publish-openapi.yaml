@@ -1,5 +1,5 @@
 #name: Publish OpenAPI specs
-name: Print OpenAPI specs on console
+name: Print and Upload OpenAPI specs
 on:
   push:
     branches:
@@ -27,4 +27,11 @@ jobs:
           distribution: temurin
 
       - name: Run my OpenAPI test
-        run: ./gradlew integration --info --tests uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest --rerun-tasks
+        run: ./gradlew integration --rerun --tests uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest --info
+
+      - name: Upload OpenAPI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: build/openapi/openapi-spec.json
+

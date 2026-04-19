@@ -18,11 +18,10 @@ dependencies {
   implementation libs.commons.collection4
   implementation libs.slf4j
 
-  testImplementation(platform('org.junit:junit-bom:6.0.2'))
-  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testImplementation libs.junit.jupiter
   testImplementation libs.mockito.core
   testImplementation libs.mockito.junit
-  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+  testRuntimeOnly libs.junit.platform
 }
 
 test {

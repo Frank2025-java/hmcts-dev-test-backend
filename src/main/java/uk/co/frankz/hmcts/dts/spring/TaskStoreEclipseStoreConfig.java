@@ -21,9 +21,6 @@ public class TaskStoreEclipseStoreConfig extends EclipseStoreClientConfiguration
     @Value("${org.eclipse.store.storage-directory:eclipse-storage-task}")
     private String dir;
 
-    private final EclipseStoreProperties properties;
-    private final EmbeddedStorageFoundationFactory foundationFactory;
-
     @Autowired
     public TaskStoreEclipseStoreConfig(
         @Autowired EclipseStoreProperties defaultEclipseStoreProperties,
@@ -31,9 +28,6 @@ public class TaskStoreEclipseStoreConfig extends EclipseStoreClientConfiguration
         @Autowired ClassLoaderProvider classLoaderProvider) {
 
         super(defaultEclipseStoreProperties, defaultEclipseStoreProvider, classLoaderProvider);
-
-        properties = defaultEclipseStoreProperties;
-        foundationFactory = defaultEclipseStoreProvider;
     }
 
     @Override

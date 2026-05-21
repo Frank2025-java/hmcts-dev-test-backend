@@ -13,7 +13,9 @@ repositories {
 dependencies {
   implementation libs.lombok
   annotationProcessor libs.lombok
+  compileOnly libs.jakarta.servlet.api
   implementation libs.jakarta.validation
+  implementation libs.jakarta.annotations
   implementation libs.commons.lang3
   implementation libs.commons.collection4
   implementation libs.slf4j
@@ -22,6 +24,7 @@ dependencies {
   testImplementation libs.mockito.core
   testImplementation libs.mockito.junit
   testRuntimeOnly libs.junit.platform
+  testImplementation libs.jakarta.servlet.api
 }
 
 test {

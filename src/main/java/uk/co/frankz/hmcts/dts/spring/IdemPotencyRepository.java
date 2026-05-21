@@ -17,25 +17,25 @@ import static uk.co.frankz.hmcts.dts.spring.IdemPotencyEntity.toEntity;
 /**
  * IdemPotencyRepository is the API for storing and retrieving {@link IdemPotencyRecord} instances
  * in an EclipseStore-backed persistence layer.
- * <p>
- * This repository provides CRUD-style access to idempotency records used to enforce
+ *
+ * <p>This repository provides CRUD-style access to idempotency records used to enforce
  * exactly once semantics for HTTP operations. Each record is uniquely identified by
  * its idempotency key, which acts as the primary identifier.
- * <p>
- * The repository is intentionally storage-agnostic at the domain level: the
+ *
+ * <p>The repository is intentionally storage-agnostic at the domain level: the
  * {@link IdemPotencyRecord} type contains no persistence annotations, and this
  * repository serves as the EclipseStore-specific adapter behind the generic
  * {@code IdempotencyStore} abstraction. Other persistence backends (e.g. DynamoDB)
  * implement the same abstraction without relying on this interface.
- * <p>
- * Typical usage:
+ *
+ * <p>Typical usage:
  * <ul>
  *     <li>Check whether a completed idempotency record already exists for a key.</li>
  *     <li>Persist a new record when a request is processed.</li>
  *  </ul>
- * <p>
- *  Implementations of this repository are provided automatically by Spring Data
- *  EclipseStore when {@code @EnableEclipseStoreRepositories} is active.
+ *
+ * <p>Implementations of this repository are provided automatically by Spring Data
+ * EclipseStore when {@code @EnableEclipseStoreRepositories} is active.
  */
 @Repository
 public interface IdemPotencyRepository extends EclipseStoreRepository<IdemPotencyEntity, String>, IdemPotencyStore {
@@ -56,8 +56,8 @@ public interface IdemPotencyRepository extends EclipseStoreRepository<IdemPotenc
     /**
      * Saves the given idempotency record if it has a valid idem potency scope key,
      * and if it has not been added by a parallel thread.
-     * <p>
-     * This method provides a simple concurrency guard to ensure that two threads
+     *
+     * <p>This method provides a simple concurrency guard to ensure that two threads
      * do not create the same idempotency entry simultaneously. The operation is
      * performed inside a {@code synchronized} block on the repository instance,
      * making the check‑then‑save sequence atomic.

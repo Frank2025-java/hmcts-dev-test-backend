@@ -86,7 +86,9 @@ public class WrapperResponseFilter {
         };
     }
 
-    private @NonNull HttpServletResponse replaceOutputStream(final HttpServletResponse response, final ByteArrayOutputStream buffer) {
+    private @NonNull HttpServletResponse replaceOutputStream(
+        final HttpServletResponse response,
+        final ByteArrayOutputStream buffer) {
 
         return new HttpServletResponseWrapper(response) {
             @Override

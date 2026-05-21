@@ -2,7 +2,6 @@ package uk.co.frankz.hmcts.dts.spring.http;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
-import jakarta.validation.constraints.NotNull;
 
 import java.io.ByteArrayInputStream;
 

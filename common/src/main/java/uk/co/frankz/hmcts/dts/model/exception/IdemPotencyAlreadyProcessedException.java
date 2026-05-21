@@ -10,8 +10,8 @@ public class IdemPotencyAlreadyProcessedException extends IdemPotencyException {
     // RFC 8470 — Early Data (TLS 1.3)
     public IdemPotencyAlreadyProcessedException() {
         super(
-            425, "The original request with idempotency key was processed in parallel. " +
-                "Do not retry, but check request again."
+            425, "The original request with idempotency key was processed in parallel. "
+                + "Do not retry, but check request again."
         );
     }
 }

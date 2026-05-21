@@ -8,19 +8,19 @@ import java.util.Optional;
 
 /**
  * Persistence abstraction for storing and retrieving idempotency records.
- * <p>
- * An {@code IdemPotencyStore} ensures that HTTP operations identified by an
+ *
+ * <p>An {@code IdemPotencyStore} ensures that HTTP operations identified by an
  * {@link IdemPotencyScopeKey} are executed at most once.
- * <p>
- * Implementations must be thread‑safe and guarantee that concurrent requests
+ *
+ * <p>Implementations must be thread‑safe and guarantee that concurrent requests
  * for the same idempotency key do not result in duplicate processing.
  */
 public interface IdemPotencyStore {
 
     /**
      * Retrieves a previously idempotency record for the given key.
-     * <p>
-     * If a record exists, the stored
+     *
+     * <p>If a record exists, the stored
      * response body, status code, and content type can be returned directly
      * to the client without re‑executing the underlying operation.
      *

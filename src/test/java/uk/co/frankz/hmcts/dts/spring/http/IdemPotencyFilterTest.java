@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class IdempotencyFilterTest {
+class IdemPotencyFilterTest {
 
     private IdemPotencyFilter testSubject;
 

@@ -44,7 +44,7 @@ public record IdemPotencyScopeKey(
      * Example: "POST:/payments:abc123"
      */
     private String canonical() {
-       return method.toUpperCase() + ":" + path + ":" + idempotencyKey;
+        return method.toUpperCase() + ":" + path + ":" + idempotencyKey;
     }
 
     /**
@@ -52,14 +52,14 @@ public record IdemPotencyScopeKey(
      * Useful when storing keys in DynamoDB or EclipseStore.
      */
     public IdemPotencyHash sha256() throws IdemPotencyHash256Exception {
-            return sha256Hex(canonical().getBytes(UTF_8));
+        return sha256Hex(canonical().getBytes(UTF_8));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof IdemPotencyScopeKey other) {
 
-                return this.sha256().equals(other.sha256());
+            return this.sha256().equals(other.sha256());
 
         }
         if (obj instanceof IdemPotencyHash other) {

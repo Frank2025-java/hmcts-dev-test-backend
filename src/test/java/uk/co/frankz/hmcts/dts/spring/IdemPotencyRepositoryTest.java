@@ -34,13 +34,13 @@ class IdemPotencyRepositoryTest {
     @Autowired
     IdemPotencyRepository testSubject;
 
-    private final static IdemPotencyHash TEST_KEY = IdemPotencyHash.sha256Hex(randomUUID().toString().getBytes(UTF_8));
+    private static final IdemPotencyHash TEST_KEY = IdemPotencyHash.sha256Hex(randomUUID().toString().getBytes(UTF_8));
 
-    private final static String TEST_ID = TEST_KEY.value();
+    private static final String TEST_ID = TEST_KEY.value();
 
-    private final static byte[] TEST_BODY = "body".getBytes(UTF_8);
+    private static final byte[] TEST_BODY = "body".getBytes(UTF_8);
 
-    private final static IdemPotencyHash request = IdemPotencyHash.sha256Hex(TEST_BODY);
+    private static final IdemPotencyHash request = IdemPotencyHash.sha256Hex(TEST_BODY);
 
     @Test
     @Order(1)

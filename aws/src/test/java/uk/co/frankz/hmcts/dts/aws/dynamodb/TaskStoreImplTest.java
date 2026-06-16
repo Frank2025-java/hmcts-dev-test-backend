@@ -50,7 +50,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldSaveNewEntityUsingSave() throws Exception {
+    void shouldSaveNewEntityUsingSave() {
         // given
         TaskWithId task = testTaskNew;
 
@@ -63,7 +63,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldSaveExistingEntityUsingUpdate() throws Exception {
+    void shouldSaveExistingEntityUsingUpdate() {
         // given
         TaskWithId task = testTaskExisting;
 
@@ -76,7 +76,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldWrapExceptionsThrownDuringSave() throws Exception {
+    void shouldWrapExceptionsThrownDuringSave() {
         // given
         TaskWithId task = testTaskNew;
         doThrow(new RuntimeException("boom")).when(mockProvider).save(task);
@@ -123,7 +123,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldReturnAllTasks() throws Exception {
+    void shouldReturnAllTasks() {
         // given
         List<TaskWithId> tasks = List.of(testTaskExisting);
         when(mockProvider.findAll()).thenReturn(tasks);
@@ -136,7 +136,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldWrapExceptionsThrownDuringFindAll() throws Exception {
+    void shouldWrapExceptionsThrownDuringFindAll() {
         // given
         when(mockProvider.findAll()).thenThrow(new RuntimeException("boom"));
 
@@ -145,7 +145,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldPassHealthCheckWhenTableIsActive() throws Exception {
+    void shouldPassHealthCheckWhenTableIsActive() {
         // given
         TableStatus given = TableStatus.ACTIVE;
         DescribeTableEnhancedResponse desc = mock(DescribeTableEnhancedResponse.class);
@@ -160,7 +160,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldFailHealthCheckWhenTableIsNotActive() throws Exception {
+    void shouldFailHealthCheckWhenTableIsNotActive() {
         // given
         TableStatus given = TableStatus.CREATING;
         DescribeTableEnhancedResponse desc = mock(DescribeTableEnhancedResponse.class);
@@ -175,7 +175,7 @@ class TaskStoreImplTest {
     }
 
     @Test
-    void shouldWrapExceptionsThrownDuringHealthCheck() throws Exception {
+    void shouldWrapExceptionsThrownDuringHealthCheck() {
         // given
         when(mockProvider.describe()).thenThrow(new RuntimeException("boom"));
 

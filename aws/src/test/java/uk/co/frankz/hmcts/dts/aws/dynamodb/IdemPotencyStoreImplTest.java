@@ -96,7 +96,7 @@ class IdemPotencyStoreImplTest {
     }
 
     @Test
-    void shouldSaveRecordWhenNotDuplicate() throws Exception {
+    void shouldSaveRecordWhenNotDuplicate() {
         // given
         when(mockProvider.find(any())).thenReturn(null);
 
@@ -109,7 +109,7 @@ class IdemPotencyStoreImplTest {
     }
 
     @Test
-    void shouldWrapExceptionsDuringSave() throws Exception {
+    void shouldWrapExceptionsDuringSave() {
         // given
         when(mockProvider.find(any())).thenReturn(null);
         doThrow(new RuntimeException("boom")).when(mockProvider).save(any());

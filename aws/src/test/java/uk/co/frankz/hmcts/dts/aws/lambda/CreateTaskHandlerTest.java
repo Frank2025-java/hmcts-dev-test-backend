@@ -1,6 +1,5 @@
 package uk.co.frankz.hmcts.dts.aws.lambda;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,12 +7,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Arrays.stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +37,12 @@ class CreateTaskHandlerTest {
     TaskService<TaskWithId> mockService;
 
     @Mock
+    IdemPotencyScopeKeyBuilder mockIdemPotency;
+
+    @Mock
+    IdemPotencyStore mockIdemPotencyStore;
+
+    @Mock
     Mapper mockMapper;
 
     private static final Action TEST_ACTION = Action.CREATE;
@@ -45,7 +54,7 @@ class CreateTaskHandlerTest {
     @BeforeEach
     void setup() {
 
-        testSubject = new CreateTaskHandler(mockService, mockMapper);
+        testSubject = new CreateTaskHandler(mockService, mockMapper, mockIdemPotency, mockIdemPotencyStore);
 
         lenient().when(mockMapper.toEntity(anyString())).thenReturn(new TaskWithId());
         lenient().when(mockMapper.toDto(any(TaskWithId.class))).thenReturn(new TaskDto());
@@ -56,6 +65,8 @@ class CreateTaskHandlerTest {
         lenient().when(mockService.update(any())).thenReturn(new TaskWithId());
         lenient().when(mockService.update(any(), anyString())).thenReturn(new TaskWithId());
         lenient().when(mockService.getAll()).thenReturn(stream(new TaskWithId[]{new TaskWithId()}));
+        lenient().when(mockIdemPotency.build(any())).thenReturn(Optional.empty());
+        lenient().when(mockIdemPotencyStore.findById(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -65,12 +76,12 @@ class CreateTaskHandlerTest {
         when(mockMapper.toJsonString(any(TaskWithId.class))).thenReturn(given);
 
         // when
-        Pair<String, Integer> actual = testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
+        ResponseFields actual = testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
 
         // then
         verify(mockService).createTask(any(TaskWithId.class));
-        assertEquals(given, actual.getLeft());
-        assertEquals(201, actual.getRight());
+        assertEquals(given, actual.body());
+        assertEquals(201, actual.status());
     }
 
     @Test

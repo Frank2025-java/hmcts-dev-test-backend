@@ -9,7 +9,6 @@ import uk.co.frankz.hmcts.dts.model.IdemPotencyScopeKey;
 import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyAlreadyProcessedException;
 import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 
-import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static uk.co.frankz.hmcts.dts.spring.IdemPotencyEntity.toEntity;
@@ -39,19 +38,6 @@ import static uk.co.frankz.hmcts.dts.spring.IdemPotencyEntity.toEntity;
  */
 @Repository
 public interface IdemPotencyRepository extends EclipseStoreRepository<IdemPotencyEntity, String>, IdemPotencyStore {
-
-    @Override
-    default void cleanupExpired(long cutoffTimestamp) {
-        findAll().stream()
-            .filter(record -> record
-                .toDomain()
-                .createdAt()
-                .atZone(ZoneOffset.UTC)
-                .toInstant()
-                .toEpochMilli()
-                < cutoffTimestamp)
-            .forEach(this::delete);
-    }
 
     /**
      * Saves the given idempotency record if it has a valid idem potency scope key,

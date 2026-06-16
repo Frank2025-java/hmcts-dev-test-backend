@@ -5,8 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockFilterChain;
@@ -24,6 +22,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
@@ -41,7 +40,7 @@ class IdemPotencyFilterTest {
     private IdemPotencyStore mockStore;
 
     @Mock
-    private IdemPotencyKeyBuilder mockKeyBuilder;
+    private IdemPotencyScopeKeyBuilder mockKeyBuilder;
 
     @Mock
     private MockFilterChain mockFilterChain;
@@ -88,12 +87,10 @@ class IdemPotencyFilterTest {
         lenient().when(mockMismatchEx.getIssue()).thenReturn(mockIssue);
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void shouldStoreResponse(String givenMethod) throws Exception {
+    @Test
+    void shouldStoreResponse() throws Exception {
 
         // given
-        when(mockRequest.getMethod()).thenReturn(givenMethod);
         when(mockStore.findById(any())).thenReturn(Optional.empty());
         when(mockWrapperFilterChain.doFilterExtractIdemPotency(eq(TEST_KEY), any(), any(), any())).thenReturn(
             TEST_IDEM_RECORD);
@@ -105,12 +102,10 @@ class IdemPotencyFilterTest {
         verify(mockStore).saveSafe(TEST_IDEM_RECORD);
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void shouldReturnStoredResponse(String givenMethod) throws Exception {
+    @Test
+    void shouldReturnStoredResponse() throws Exception {
 
         // given
-        when(mockRequest.getMethod()).thenReturn(givenMethod);
         when(mockStore.findById(any())).thenReturn(Optional.of(TEST_IDEM_RECORD));
 
         // when
@@ -122,12 +117,10 @@ class IdemPotencyFilterTest {
         verify(mockStore, never()).saveSafe(TEST_IDEM_RECORD);
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void shouldWriteErrorOnIdemPotencyException(String givenMethod) throws Exception {
+    @Test
+    void shouldWriteErrorOnIdemPotencyException() throws Exception {
 
         // given
-        when(mockRequest.getMethod()).thenReturn(givenMethod);
         when(mockStore.findById(any())).thenReturn(Optional.of(TEST_IDEM_RECORD));
         doThrow(mockMismatchEx).when(mockWrapperFilterChain).doFilterUsingIdemPotency(any(), any(), any());
 
@@ -137,15 +130,13 @@ class IdemPotencyFilterTest {
         // then
         verifyNoInteractions(mockFilterChain);
         verify(mockStore, never()).saveSafe(TEST_IDEM_RECORD);
-        verify(mockIssue).sendError(mockResponse);
+        verify(mockResponse).sendError(anyInt(), any());
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void shouldPropagateRuntimeExceptions(String givenMethod) {
+    @Test
+    void shouldPropagateRuntimeExceptions() {
 
         // given
-        when(mockRequest.getMethod()).thenReturn(givenMethod);
         RuntimeException givenEx = new RuntimeException();
         when(mockKeyBuilder.build(any())).thenThrow(givenEx);
 
@@ -160,12 +151,10 @@ class IdemPotencyFilterTest {
         assertSame(givenEx, actual);
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void shouldPropagateRuntimeExceptionsFromWrappedFilter(String givenMethod) throws Exception {
+    @Test
+    void shouldPropagateRuntimeExceptionsFromWrappedFilter() throws Exception {
 
         // given
-        when(mockRequest.getMethod()).thenReturn(givenMethod);
         when(mockStore.findById(any())).thenReturn(Optional.of(TEST_IDEM_RECORD));
         RuntimeException givenEx = new RuntimeException();
         doThrow(givenEx).when(mockWrapperFilterChain).doFilterUsingIdemPotency(any(), any(), any());
@@ -181,31 +170,16 @@ class IdemPotencyFilterTest {
         assertSame(givenEx, actual);
     }
 
-    @ParameterizedTest
-    @CsvSource({"POST", "PUT", "DELETE"})
-    void passesThroughWhenNoKey(String method) throws Exception {
+    @Test
+    void passesThroughWhenNoKey() throws Exception {
         // given
-        when(mockRequest.getMethod()).thenReturn(method);
-        when(mockKeyBuilder.build(any())).thenReturn(Optional.empty());
+        when(mockKeyBuilder.build(any(HttpServletRequest.class))).thenReturn(Optional.empty());
 
         // when
         testSubject.doFilter(mockRequest, mockResponse, mockFilterChain);
 
         // them
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
-        verifyNoInteractions(mockStore);
-    }
-
-    @Test
-    void passesThroughForGetRequests() throws Exception {
-        // given
-        when(mockRequest.getMethod()).thenReturn("Get");
-
-        // when
-        testSubject.doFilter(mockRequest, mockResponse, mockFilterChain);
-
-        // then
-        verify(mockFilterChain).doFilter(any(), any());
         verifyNoInteractions(mockStore);
     }
 }

@@ -1,18 +1,13 @@
 package uk.co.frankz.hmcts.dts.model;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyBlankFieldsException;
-import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyException;
-import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyInvalidKeyException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class IdemPotencyScopeKeyTest {
 
@@ -60,23 +55,6 @@ class IdemPotencyScopeKeyTest {
     }
 
     @Test
-    void scopeKeyBuildsFromHttpServletRequest() throws IdemPotencyException {
-        // given
-        HttpServletRequest given = mock(HttpServletRequest.class);
-        when(given.getMethod()).thenReturn("PUT");
-        when(given.getRequestURI()).thenReturn("/orders/123");
-        when(given.getHeader("Idempotency-Key")).thenReturn("xyz");
-
-        // when
-        IdemPotencyScopeKey key = IdemPotencyScopeKey.scopeKey(given);
-
-        // then
-        assertEquals("PUT", key.method());
-        assertEquals("/orders/123", key.path());
-        assertEquals("xyz", key.idempotencyKey());
-    }
-
-    @Test
     void shouldBeEqualIgnoreCaseMethod() {
         var key1 = new IdemPotencyScopeKey("POST", "/p", "abc");
         var key2 = new IdemPotencyScopeKey("Post", "/p", "abc");
@@ -88,21 +66,6 @@ class IdemPotencyScopeKeyTest {
         var key1 = new IdemPotencyScopeKey("PUT", "/id/123", "abc");
         var key2 = new IdemPotencyScopeKey("DELETE", "/id/123", "abc");
         assertNotEquals(key1, key2);
-    }
-
-    @Test
-    void shouldThrowCheckedExceptionOnScopeKeyBuildsFromHttpServletRequest() {
-        // given
-        HttpServletRequest given = mock(HttpServletRequest.class);
-        when(given.getMethod()).thenReturn("Post");
-        when(given.getRequestURI()).thenReturn("/orders/123");
-        when(given.getHeader("Idempotency-Key")).thenReturn(null);
-
-        // when, then
-        assertThrows(
-            IdemPotencyInvalidKeyException.class,
-            () -> IdemPotencyScopeKey.scopeKey(given)
-        );
     }
 
 }

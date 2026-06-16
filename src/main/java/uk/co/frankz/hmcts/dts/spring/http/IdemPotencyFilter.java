@@ -10,6 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import uk.co.frankz.hmcts.dts.model.IdemPotencyRecord;
 import uk.co.frankz.hmcts.dts.model.IdemPotencyScopeKey;
 import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyException;
+import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyIssue;
 import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 
 import java.io.IOException;
@@ -22,11 +23,11 @@ public class IdemPotencyFilter extends OncePerRequestFilter {
 
     private final WrapperResponseFilter idemPotencyInnerFilter;
 
-    private final IdemPotencyKeyBuilder keyBuilder;
+    private final IdemPotencyScopeKeyBuilder keyBuilder;
 
     public IdemPotencyFilter(
         IdemPotencyStore store,
-        IdemPotencyKeyBuilder keyBuilder,
+        IdemPotencyScopeKeyBuilder keyBuilder,
         WrapperResponseFilter innerFilter
     ) {
         this.store = store;
@@ -40,12 +41,6 @@ public class IdemPotencyFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain chain
     ) throws ServletException, IOException {
-
-        // Only apply to mutating methods
-        if (!isMutating(request)) {
-            chain.doFilter(request, response);
-            return;
-        }
 
         Optional<IdemPotencyScopeKey> key = keyBuilder.build(request);
         if (key.isEmpty()) {
@@ -74,17 +69,10 @@ public class IdemPotencyFilter extends OncePerRequestFilter {
                 store.saveSafe(record);
             }
         } catch (IdemPotencyException e) {
-            e.getIssue().sendError(response);
+            IdemPotencyIssue issue = e.getIssue();
+            response.sendError(issue.getHttpStatus(), issue.getMessage());
         }
     }
-
-    private boolean isMutating(HttpServletRequest req) {
-        return switch (req.getMethod()) {
-            case "POST", "PUT", "PATCH", "DELETE" -> true;
-            default -> false;
-        };
-    }
-
 }
 
 

@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.apache.commons.lang3.tuple.Pair;
 import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
@@ -30,11 +32,16 @@ public class DeleteTaskHandler extends BaseTaskHandler
     /**
      * Constructor allowing unit test with mocks.
      *
-     * @param service allows unit testing with mock TaskService
-     * @param json    allows unit testing with mock Mapper
+     * @param service          allows unit testing with mock TaskService
+     * @param json             allows unit testing with mock Mapper
+     * @param idemPotency      the builder for IdemPotencyScopeKey
+     * @param idemPotencyStore the dynamoDb table
      */
-    DeleteTaskHandler(TaskService<TaskWithId> service, Mapper json) {
-        super(service, json);
+    DeleteTaskHandler(TaskService<TaskWithId> service,
+                      Mapper json,
+                      IdemPotencyScopeKeyBuilder idemPotency,
+                      IdemPotencyStore idemPotencyStore) {
+        super(service, json, idemPotency, idemPotencyStore);
     }
 
     @Operation(summary = "Delete a Task by ID.")
@@ -44,13 +51,13 @@ public class DeleteTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "500", description = "Technical exceptions.", content = @Content)
     })
     @Override
-    protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)
+    protected ResponseFields handle(Action action, String requestBody, Map<String, String> pathParams)
         throws Exception {
 
         String id = getId(pathParams);
 
         service.delete(id);
 
-        return Pair.of("", HttpStatusCode.NO_CONTENT);
+        return new ResponseFields(new byte[0], HttpStatusCode.NO_CONTENT);
     }
 }

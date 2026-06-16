@@ -1,12 +1,9 @@
 package uk.co.frankz.hmcts.dts.model;
 
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyBlankFieldsException;
-import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyException;
 import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyHash256Exception;
-import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyInvalidKeyException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -21,21 +18,6 @@ public record IdemPotencyScopeKey(
     public IdemPotencyScopeKey {
         if (isBlank(method) || isBlank(path) || isBlank(idempotencyKey)) {
             throw new IdemPotencyBlankFieldsException();
-        }
-    }
-
-    public static IdemPotencyScopeKey scopeKey(HttpServletRequest request) throws IdemPotencyException {
-
-        try {
-            return new IdemPotencyScopeKey(
-                request.getMethod(),
-                request.getRequestURI(),
-                request.getHeader("Idempotency-Key") // returns null when not present
-            );
-        } catch (IdemPotencyBlankFieldsException e) {
-            throw new IdemPotencyInvalidKeyException(e);
-        } catch (Exception e) {
-            throw new IdemPotencyException(e);
         }
     }
 

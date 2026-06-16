@@ -4,7 +4,13 @@ import java.util.Map;
 
 public interface Header {
 
-    Map<String, String> JSON = Map.of("Content-Type", "application/json");
+    String CONTENT_TYPE = "Content-Type";
 
-    Map<String, String> HTML = Map.of("Content-Type", "text/html");
+    Map<String, String> JSON = Map.of(CONTENT_TYPE, "application/json");
+
+    Map<String, String> HTML = Map.of(CONTENT_TYPE, "text/html");
+
+    static Map<String, String> contentOfType(String contentType) {
+        return Map.of(CONTENT_TYPE, contentType);
+    }
 }

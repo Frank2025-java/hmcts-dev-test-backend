@@ -8,13 +8,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.apache.commons.lang3.tuple.Pair;
 import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
@@ -35,9 +38,14 @@ public class UpdateTaskHandler extends BaseTaskHandler
      *
      * @param service allows unit testing with mock TaskService
      * @param json    allows unit testing with mock Mapper
+     * @param idemPotency      the builder for IdemPotencyScopeKey
+     * @param idemPotencyStore the dynamoDb table
      */
-    UpdateTaskHandler(TaskService<TaskWithId> service, Mapper json) {
-        super(service, json);
+    UpdateTaskHandler(TaskService<TaskWithId> service,
+                      Mapper json,
+                      IdemPotencyScopeKeyBuilder idemPotency,
+                      IdemPotencyStore idemPotencyStore) {
+        super(service, json, idemPotency, idemPotencyStore);
     }
 
     @Operation(summary = "Update Status by ID.")
@@ -52,7 +60,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
             content = @Content),
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
-    Pair<String, Integer> update(Map<String, String> pathParams) {
+    ResponseFields update(Map<String, String> pathParams) {
 
         String id = getId(pathParams);
         String status = get(pathParams, Action.PARM.STATUS);
@@ -60,7 +68,7 @@ public class UpdateTaskHandler extends BaseTaskHandler
         TaskWithId taskWitId = service.update(id, status);
         String body = json.toJsonString(taskWitId);
 
-        return Pair.of(body, HttpStatusCode.OK);
+        return new ResponseFields(body, HttpStatusCode.OK, Header.JSON);
     }
 
     @Operation(summary = "Update Task fields.")
@@ -78,16 +86,16 @@ public class UpdateTaskHandler extends BaseTaskHandler
             description = "Other exceptions.",
             content = @Content)
     })
-    Pair<String, Integer> update(String requestBody) {
+    ResponseFields update(String requestBody) {
         TaskWithId task = json.toEntity(requestBody);
         TaskWithId taskWitId = service.update(task);
         String body = json.toJsonString(taskWitId);
 
-        return Pair.of(body, HttpStatusCode.OK);
+        return new ResponseFields(body, HttpStatusCode.OK, Header.JSON);
     }
 
     @Override
-    protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)
+    protected ResponseFields handle(Action action, String requestBody, Map<String, String> pathParams)
         throws Exception {
 
         if (action == Action.UPDATE) {

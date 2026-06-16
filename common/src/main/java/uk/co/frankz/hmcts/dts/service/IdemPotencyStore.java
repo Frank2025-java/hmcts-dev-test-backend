@@ -37,15 +37,4 @@ public interface IdemPotencyStore {
      * @param record the idempotency record
      */
     void saveSafe(IdemPotencyRecord record) throws IdemPotencyAlreadyProcessedException;
-
-    /**
-     * Removes expired idempotency records whose creation timestamp is older
-     * than the given cutoff.
-     * AWS DynamoDB can have a TTL attribute on the table, so will not need
-     * an implementation, but EclipseStore will need some regular clean-up.
-     *
-     * @param cutoffTimestamp records older than this epoch‑millis timestamp
-     *                        should be removed
-     */
-    void cleanupExpired(long cutoffTimestamp);
 }

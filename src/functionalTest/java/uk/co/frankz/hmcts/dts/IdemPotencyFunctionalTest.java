@@ -36,8 +36,8 @@ class IdemPotencyFunctionalTest {
         LOG.info(ANSI_PURPLE + msg);
     }
 
-    //@Value("${TEST_URL:https://api.frankz.co.uk}")
-    @Value("${TEST_URL:http://localhost:4000}")
+    @Value("${TEST_URL:https://api.frankz.co.uk}")
+    //@Value("${TEST_URL:http://localhost:4000}")
     @SuppressWarnings("unused")
     private String testUrl;
 

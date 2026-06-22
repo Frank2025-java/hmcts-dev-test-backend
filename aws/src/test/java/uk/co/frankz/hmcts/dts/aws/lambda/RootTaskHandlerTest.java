@@ -3,7 +3,6 @@ package uk.co.frankz.hmcts.dts.aws.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,17 +10,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
 import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -40,6 +44,12 @@ class RootTaskHandlerTest {
     APIGatewayV2HTTPEvent mockEvent;
 
     @Mock
+    IdemPotencyScopeKeyBuilder mockIdemPotency;
+
+    @Mock
+    IdemPotencyStore mockIdemPotencyStore;
+
+    @Mock
     Context mockContext;
 
     private static final Action TEST_ACTION = Action.ROOT;
@@ -51,7 +61,10 @@ class RootTaskHandlerTest {
     @BeforeEach
     void setup() {
 
-        testSubject = new RootTaskHandler(mockService, mockMapper);
+        testSubject = new RootTaskHandler(mockService, mockMapper, mockIdemPotency, mockIdemPotencyStore);
+
+        lenient().when(mockIdemPotency.build(any())).thenReturn(Optional.empty());
+        lenient().when(mockIdemPotencyStore.findById(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -59,14 +72,14 @@ class RootTaskHandlerTest {
         // given
 
         // when
-        Pair<String, Integer> actual = testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
+        testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
 
         // then
         verify(mockService).healthCheck();
     }
 
     @Test
-    void shouldReturnHtml() throws Exception {
+    void shouldReturnHtml() {
         // given
         Map<String, String> expectedFormat = Header.HTML;
 
@@ -79,7 +92,7 @@ class RootTaskHandlerTest {
     }
 
     @Test
-    void shouldReturnHtmlOnError() throws Exception {
+    void shouldReturnHtmlOnError() {
         // given
         Map<String, String> expectedFormat = Header.HTML;
         String given = "test message";

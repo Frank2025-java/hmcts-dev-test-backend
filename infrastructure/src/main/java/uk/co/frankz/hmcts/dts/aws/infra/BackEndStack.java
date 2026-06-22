@@ -26,10 +26,11 @@ import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.deleteTaskBuilde
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.dnsEntryBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.getAllRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.getRoute;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.idemPotencyTableBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.retrieveTaskBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.rootTaskBuilder;
-import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.tableBuilder;
+import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.taskTableBuilder;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateStatusRoute;
 import static uk.co.frankz.hmcts.dts.aws.infra.BackEndComponent.updateTaskBuilder;
@@ -48,7 +49,8 @@ public class BackEndStack extends Stack {
     public BackEndStack(Construct scope, String id, StackProps props) {
         super(scope, id, props);
 
-        Table table = tableBuilder.build(this, "MyTable");
+        Table table = taskTableBuilder.build(this, "MyTable");
+        Table tableIdemPotency = idemPotencyTableBuilder.build(this, "MyTableIdemPotency");
 
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");
@@ -61,6 +63,10 @@ public class BackEndStack extends Stack {
         table.grant(deleteLambda, "dynamodb:DeleteItem");
         table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
         table.grant(updateLambda, "dynamodb:GetItem", "dynamodb:UpdateItem");
+
+        tableIdemPotency.grant(createLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");
+        tableIdemPotency.grant(deleteLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");
+        tableIdemPotency.grant(updateLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");
 
         List<AddRoutesOptions> routeOut = Arrays.asList(
             anyHeaderRoute.build(defaultLambda, "ApiGatewayRouteToLambda0"),

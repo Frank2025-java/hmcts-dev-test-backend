@@ -40,6 +40,7 @@ class CrudTaskFunctionalTest {
     }
 
     @Value("${TEST_URL:https://api.frankz.co.uk}")
+    //@Value("${TEST_URL:http://localhost:4000}")
     @SuppressWarnings("unused")
     private String testUrl;
 

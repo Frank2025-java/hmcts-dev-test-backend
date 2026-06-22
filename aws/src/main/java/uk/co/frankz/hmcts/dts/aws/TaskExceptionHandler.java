@@ -1,6 +1,9 @@
 package uk.co.frankz.hmcts.dts.aws;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
+import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyException;
+import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyIssue;
+import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyRuntimeException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.service.Header;
 
@@ -19,8 +22,23 @@ public class TaskExceptionHandler {
      */
     public static void setErrorOnResponse(Exception e, APIGatewayV2HTTPResponse response) {
 
-        String message = TaskException.toString(e);
-        int statusCode = e instanceof TaskException ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
+        final String message;
+        final int statusCode;
+
+        // With Java 21 we could do this with switch
+        if (e instanceof TaskException) {
+            statusCode = BAD_REQUEST;
+            message = TaskException.toString(e);
+        } else if (e instanceof IdemPotencyRuntimeException idre) {
+            statusCode = idre.getIssue().getHttpStatus();
+            message = IdemPotencyIssue.toString(idre);
+        } else if (e instanceof IdemPotencyException ide) {
+            statusCode = ide.getIssue().getHttpStatus();
+            message = IdemPotencyIssue.toString(ide);
+        } else {
+            statusCode = INTERNAL_SERVER_ERROR;
+            message = TaskException.toString(e);
+        }
 
         response.setBody(body(message));
         response.setStatusCode(statusCode);

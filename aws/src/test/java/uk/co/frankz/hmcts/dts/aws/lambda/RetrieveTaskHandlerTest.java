@@ -1,6 +1,5 @@
 package uk.co.frankz.hmcts.dts.aws.lambda;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,14 +9,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -40,6 +42,12 @@ class RetrieveTaskHandlerTest {
     @Mock
     Mapper mockMapper;
 
+    @Mock
+    IdemPotencyScopeKeyBuilder mockIdemPotency;
+
+    @Mock
+    IdemPotencyStore mockIdemPotencyStore;
+
     private static final String TEST_REQUEST = "";
 
     private static final Map<String, String> TEST_PARM = Map.of(Action.PARM.ID, "123");
@@ -47,7 +55,7 @@ class RetrieveTaskHandlerTest {
     @BeforeEach
     void setup() {
 
-        testSubject = new RetrieveTaskHandler(mockService, mockMapper);
+        testSubject = new RetrieveTaskHandler(mockService, mockMapper, mockIdemPotency, mockIdemPotencyStore);
 
         Stream<TaskWithId> taskStream = Arrays.stream(new TaskWithId[]{new TaskWithId()});
 
@@ -61,6 +69,8 @@ class RetrieveTaskHandlerTest {
         lenient().when(mockService.update(any())).thenReturn(new TaskWithId());
         lenient().when(mockService.update(any(), anyString())).thenReturn(new TaskWithId());
         lenient().when(mockService.getAll()).thenReturn(taskStream);
+        lenient().when(mockIdemPotency.build(any())).thenReturn(Optional.empty());
+        lenient().when(mockIdemPotencyStore.findById(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -70,7 +80,7 @@ class RetrieveTaskHandlerTest {
         String expectedId = TEST_PARM.get(Action.PARM.ID);
 
         // when
-        Pair<String, Integer> actual = testSubject.handle(given, TEST_REQUEST, TEST_PARM);
+        testSubject.handle(given, TEST_REQUEST, TEST_PARM);
 
         // then
         verify(mockService).get(eq(expectedId));
@@ -82,7 +92,7 @@ class RetrieveTaskHandlerTest {
         Action given = Action.GET_ALL;
 
         // when
-        Pair<String, Integer> actual = testSubject.handle(given, TEST_REQUEST, TEST_PARM);
+        testSubject.handle(given, TEST_REQUEST, TEST_PARM);
 
         // then
         verify(mockService).getAll();
@@ -94,16 +104,15 @@ class RetrieveTaskHandlerTest {
         mode = EnumSource.Mode.EXCLUDE,
         names = {"GET", "GET_ALL"}
     )
-    void shouldNotInvokeOnService(Action givenOther) throws Exception {
+    void shouldNotInvokeOnService(Action givenOther) {
         // given - parameter
 
-        // when
-        TaskException actual = assertThrows(
+        // when, then
+        assertThrows(
             TaskNoMatchException.class,
             () -> testSubject.handle(givenOther, TEST_REQUEST, TEST_PARM)
         );
 
-        // then
         verify(mockService, never()).get(anyString());
         verify(mockService, never()).getAll();
     }

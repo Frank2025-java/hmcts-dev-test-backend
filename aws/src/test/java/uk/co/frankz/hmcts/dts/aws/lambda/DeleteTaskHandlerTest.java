@@ -1,6 +1,5 @@
 package uk.co.frankz.hmcts.dts.aws.lambda;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,16 +7,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -28,6 +32,12 @@ class DeleteTaskHandlerTest {
 
     @Mock
     TaskService<TaskWithId> mockService;
+
+    @Mock
+    IdemPotencyScopeKeyBuilder mockIdemPotency;
+
+    @Mock
+    IdemPotencyStore mockIdemPotencyStore;
 
     @Mock
     Mapper mockMapper;
@@ -41,7 +51,10 @@ class DeleteTaskHandlerTest {
     @BeforeEach
     void setup() {
 
-        testSubject = new DeleteTaskHandler(mockService, mockMapper);
+        testSubject = new DeleteTaskHandler(mockService, mockMapper, mockIdemPotency, mockIdemPotencyStore);
+
+        lenient().when(mockIdemPotency.build(any())).thenReturn(Optional.empty());
+        lenient().when(mockIdemPotencyStore.findById(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -50,7 +63,7 @@ class DeleteTaskHandlerTest {
         String givenId = TEST_PARM.get(Action.PARM.ID);
 
         // when
-        Pair<String, Integer> actual = testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
+        testSubject.handle(TEST_ACTION, TEST_REQUEST, TEST_PARM);
 
         // then
         verify(mockService).delete(eq(givenId));

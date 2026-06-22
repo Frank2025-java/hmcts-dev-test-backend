@@ -58,5 +58,6 @@ public interface BackEndComponent {
     DnsEntryBuilder dnsEntryBuilder = new DnsEntryBuilder(DOMAIN);
     LogGroupBuilder apiLogBuilder = new LogGroupBuilder("/aws/apigateway/access-logs");
 
-    TableBuilder tableBuilder = new TableBuilder("Task");
+    TableBuilder taskTableBuilder = new TableBuilder("Task");
+    TableBuilder idemPotencyTableBuilder = new TableBuilder("IdemPotency");
 }

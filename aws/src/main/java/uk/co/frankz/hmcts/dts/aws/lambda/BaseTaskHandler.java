@@ -7,20 +7,30 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
+import uk.co.frankz.hmcts.dts.aws.dynamodb.IdemPotencyStoreImpl;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
+import uk.co.frankz.hmcts.dts.model.IdemPotencyHash;
+import uk.co.frankz.hmcts.dts.model.IdemPotencyRecord;
+import uk.co.frankz.hmcts.dts.model.IdemPotencyScopeKey;
+import uk.co.frankz.hmcts.dts.model.exception.IdemPotencyMismatchException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskInvalidArgumentException;
 import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Base64.getDecoder;
 import static uk.co.frankz.hmcts.dts.aws.TaskExceptionHandler.setErrorOnResponse;
 
 /**
@@ -34,23 +44,39 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
 
     protected final TaskService<TaskWithId> service;
     protected final Mapper json;
+    private final IdemPotencyScopeKeyBuilder idemPotency;
+    private final IdemPotencyStore idemPotencyStore;
 
     /**
      * Cold-start container constructor. Should run on container start, but not on each invocation.
      */
     protected BaseTaskHandler() {
-        this(new uk.co.frankz.hmcts.dts.aws.TaskService(DefaultCredentialsProvider.create()), new Mapper());
+        this(
+            new uk.co.frankz.hmcts.dts.aws.TaskService(),
+            new Mapper(),
+            new IdemPotencyScopeKeyBuilder(),
+            new IdemPotencyStoreImpl()
+        );
     }
 
     /**
      * Constructor allowing unit test with mocks.
      *
-     * @param service access to the database
-     * @param json    the conversion for DTOs and Jackson json mapper
+     * @param service          access to the database
+     * @param json             the conversion for DTOs and Jackson json mapper
+     * @param idemPotency      the builder for IdemPotencyScopeKey
+     * @param idemPotencyStore the dynamoDb table
      */
-    protected BaseTaskHandler(TaskService<TaskWithId> service, Mapper json) {
+    protected BaseTaskHandler(
+        TaskService<TaskWithId> service,
+        Mapper json,
+        IdemPotencyScopeKeyBuilder idemPotency,
+        IdemPotencyStore idemPotencyStore) {
+
         this.service = service;
         this.json = json;
+        this.idemPotency = idemPotency;
+        this.idemPotencyStore = idemPotencyStore;
     }
 
     @Override
@@ -61,30 +87,68 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         var response = new APIGatewayV2HTTPResponse();
 
         try {
-            String routePath = takePathFromRoutKey(event.getRouteKey());
+            Optional<IdemPotencyScopeKey> idemPotencyKey = idemPotency.build(event);
 
-            Action action = Action.fromPath(routePath);
+            ResponseFields responseResult = null;
 
-            Map<String, String> pathParams = event.getPathParameters();
+            if (idemPotencyKey.isPresent()) {
+                Optional<IdemPotencyRecord> idemPotencyRecord = idemPotencyStore.findById(idemPotencyKey.get());
 
-            out.log("Request body: " + event.getBody());
-            out.log("Request parms: " + (pathParams == null ? "none" : pathParams.toString()));
+                if (idemPotencyRecord.isPresent()) {
+                    var record = idemPotencyRecord.get();
 
-            Pair<String, Integer> result = handle(action, event.getBody(), pathParams);
+                    // make sure the idempotency key has been used for matching request body
+                    verifyRequestHash(event, record);
 
-            out.log("Result code: " + result.getRight());
+                    responseResult = new ResponseFields(
+                        record.responseBody(),
+                        record.statusCode(),
+                        Header.contentOfType(record.contentType())
+                    );
+                    out.log("Returning stored Idem Potency result " + idemPotencyKey.get());
+                }
+            }
 
-            response.setStatusCode(result.getRight());
-            response.setBody(result.getLeft());
-            response.setHeaders(Header.JSON);
+            if (responseResult == null) {
+
+                String routePath = takePathFromRoutKey(event.getRouteKey());
+
+                Action action = Action.fromPath(routePath);
+
+                Map<String, String> pathParams = event.getPathParameters();
+
+                out.log("Request body: " + event.getBody());
+                out.log("Request parms: " + (pathParams == null ? "none" : pathParams.toString()));
+
+                responseResult = handle(action, event.getBody(), pathParams);
+
+                out.log("Result code: " + responseResult.status());
+                out.log("Response: " + response.getBody());
+
+                if (idemPotencyKey.isPresent()) {
+
+                    IdemPotencyRecord record = new IdemPotencyRecord(
+                        idemPotencyKey.get().sha256(),
+                        LocalDateTime.now(),
+                        getRequestBodyHash(event),
+                        responseResult.body().getBytes(UTF_8),
+                        responseResult.status(),
+                        responseResult.header().get(Header.CONTENT_TYPE)
+                    );
+
+                    idemPotencyStore.saveSafe(record);
+                }
+            }
+
+            response.setStatusCode(responseResult.status());
+            response.setBody(responseResult.body());
+            response.setHeaders(responseResult.header());
 
         } catch (Exception e) {
             out.log(stackTrace(e));
             out.log(TaskException.toString(e));
             setErrorOnResponse(e, response);
         }
-
-        out.log("Response: " + response.getBody());
 
         return response;
     }
@@ -95,7 +159,7 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         return sw.toString();
     }
 
-    protected abstract Pair<String, Integer> handle(
+    protected abstract ResponseFields handle(
         Action action,
         String requestBody,
         Map<String, String> pathParams) throws Exception;
@@ -129,6 +193,29 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
         String[] parts = routeKey.split(" ", 2);
 
         return parts.length > 1 ? parts[1] : "";
+    }
+
+    // utility method, also available method for unit testing
+    IdemPotencyHash getRequestBodyHash(APIGatewayV2HTTPEvent event) {
+
+        byte[] bodyBytes;
+
+        if (event.getIsBase64Encoded()) {
+            bodyBytes = getDecoder().decode(event.getBody());
+        } else {
+            bodyBytes = event.getBody() == null ? new byte[0] : event.getBody().getBytes(UTF_8);
+
+        }
+
+        return IdemPotencyHash.sha256Hex(bodyBytes);
+    }
+
+    private void verifyRequestHash(APIGatewayV2HTTPEvent event, IdemPotencyRecord record)
+        throws IdemPotencyMismatchException {
+
+        if (!getRequestBodyHash(event).equals(record.requestHash())) {
+            throw new IdemPotencyMismatchException();
+        }
     }
 
 }

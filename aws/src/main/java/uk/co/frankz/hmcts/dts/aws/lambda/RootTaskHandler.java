@@ -5,12 +5,14 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import org.apache.commons.lang3.tuple.Pair;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.service.Action;
 import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
@@ -29,11 +31,16 @@ public class RootTaskHandler extends BaseTaskHandler
     /**
      * Constructor allowing unit test with mocks.
      *
-     * @param service allows unit testing with mock TaskService
-     * @param json    allows unit testing with mock Mapper
+     * @param service          allows unit testing with mock TaskService
+     * @param json             allows unit testing with mock Mapper
+     * @param idemPotency      the builder for IdemPotencyScopeKey
+     * @param idemPotencyStore the dynamoDb table
      */
-    RootTaskHandler(TaskService<TaskWithId> service, Mapper json) {
-        super(service, json);
+    RootTaskHandler(TaskService<TaskWithId> service,
+                    Mapper json,
+                    IdemPotencyScopeKeyBuilder idemPotency,
+                    IdemPotencyStore idemPotencyStore) {
+        super(service, json, idemPotency, idemPotencyStore);
     }
 
     private static final String BODY_FORMAT = "<!DOCTYPE html><html>"
@@ -52,10 +59,10 @@ public class RootTaskHandler extends BaseTaskHandler
         var response = new APIGatewayV2HTTPResponse();
 
         try {
-            Pair<String, Integer> result = handle(null, null, null);
+            ResponseFields result = handle(null, null, null);
 
-            response.setStatusCode(result.getRight());
-            response.setBody(body(result.getLeft()));
+            response.setStatusCode(result.status());
+            response.setBody(body(result.body()));
             response.setHeaders(Header.HTML);
 
         } catch (Exception e) {
@@ -69,17 +76,17 @@ public class RootTaskHandler extends BaseTaskHandler
     }
 
     @Override
-    protected Pair<String, Integer> handle(Action action, String requestBody, Map<String, String> pathParams)
+    protected ResponseFields handle(Action action, String requestBody, Map<String, String> pathParams)
         throws Exception {
 
         try {
             service.healthCheck();
 
             // if healthty
-            return Pair.of("OK", 200);
+            return new ResponseFields("OK", 200, Header.HTML);
 
         } catch (TaskException e) {
-            return Pair.of(e.getMessage(), 200);
+            return new ResponseFields(e.getMessage(), 200, Header.HTML);
         }
     }
 

@@ -1,6 +1,5 @@
 package uk.co.frankz.hmcts.dts.aws.lambda;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,14 +9,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.model.Status;
 import uk.co.frankz.hmcts.dts.model.exception.TaskException;
 import uk.co.frankz.hmcts.dts.model.exception.TaskNoMatchException;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +47,12 @@ class UpdateTaskHandlerTest {
     @Mock
     Mapper mockMapper;
 
+    @Mock
+    IdemPotencyScopeKeyBuilder mockIdemPotency;
+
+    @Mock
+    IdemPotencyStore mockIdemPotencyStore;
+
     private static final String TEST_REQUEST = "json request";
 
     private static final String TEST_RESPONSE = "json response";
@@ -66,7 +75,7 @@ class UpdateTaskHandlerTest {
     @BeforeEach
     void setup() {
 
-        testSubject = new UpdateTaskHandler(mockService, mockMapper);
+        testSubject = new UpdateTaskHandler(mockService, mockMapper, mockIdemPotency, mockIdemPotencyStore);
 
         testTaskBefore = new TaskWithId();
         testTaskBefore.setUUID(TEST_ID);
@@ -82,6 +91,8 @@ class UpdateTaskHandlerTest {
         lenient().when(mockService.update(any(), anyString())).thenReturn(testTaskAfter);
         lenient().when(mockMapper.toJsonString(any(TaskDto.class))).thenReturn(TEST_RESPONSE);
         lenient().when(mockMapper.toJsonString(any(TaskWithId.class))).thenReturn(TEST_RESPONSE);
+        lenient().when(mockIdemPotency.build(any())).thenReturn(Optional.empty());
+        lenient().when(mockIdemPotencyStore.findById(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -114,14 +125,14 @@ class UpdateTaskHandlerTest {
         // given
 
         // when
-        Pair<String, Integer> actual = testSubject.update(TEST_REQUEST);
+        ResponseFields actual = testSubject.update(TEST_REQUEST);
 
         // then
         verify(mockService).update(eq(testTaskBefore));
         verify(mockMapper).toJsonString(eq(testTaskAfter));
         assertNotNull(actual);
-        assertEquals(200, actual.getRight());
-        assertEquals(TEST_RESPONSE, actual.getLeft());
+        assertEquals(200, actual.status());
+        assertEquals(TEST_RESPONSE, actual.body());
     }
 
     @Test
@@ -131,14 +142,14 @@ class UpdateTaskHandlerTest {
         String givenStatus = TEST_PARM.get(Action.PARM.STATUS);
 
         // when
-        Pair<String, Integer> actual = testSubject.update(TEST_PARM);
+        ResponseFields actual = testSubject.update(TEST_PARM);
 
         // then
         verify(mockService).update(eq(givenId), eq(givenStatus));
         verify(mockMapper).toJsonString(eq(testTaskAfter));
         assertNotNull(actual);
-        assertEquals(200, actual.getRight());
-        assertEquals(TEST_RESPONSE, actual.getLeft());
+        assertEquals(200, actual.status());
+        assertEquals(TEST_RESPONSE, actual.body());
     }
 
     @ParameterizedTest

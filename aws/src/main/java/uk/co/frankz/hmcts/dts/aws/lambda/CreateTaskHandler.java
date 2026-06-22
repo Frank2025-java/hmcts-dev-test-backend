@@ -8,12 +8,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.apache.commons.lang3.tuple.Pair;
 import software.amazon.awssdk.http.HttpStatusCode;
 import uk.co.frankz.hmcts.dts.aws.Mapper;
 import uk.co.frankz.hmcts.dts.aws.dynamodb.TaskWithId;
+import uk.co.frankz.hmcts.dts.aws.http.IdemPotencyScopeKeyBuilder;
+import uk.co.frankz.hmcts.dts.aws.http.ResponseFields;
 import uk.co.frankz.hmcts.dts.dto.TaskDto;
 import uk.co.frankz.hmcts.dts.service.Action;
+import uk.co.frankz.hmcts.dts.service.Header;
+import uk.co.frankz.hmcts.dts.service.IdemPotencyStore;
 import uk.co.frankz.hmcts.dts.service.TaskService;
 
 import java.util.Map;
@@ -34,9 +37,14 @@ public class CreateTaskHandler extends BaseTaskHandler
      *
      * @param service allows unit testing with mock TaskService
      * @param json    allows unit testing with mock Mapper
+     * @param idemPotency      the builder for IdemPotencyScopeKey
+     * @param idemPotencyStore the dynamoDb table
      */
-    CreateTaskHandler(TaskService<TaskWithId> service, Mapper json) {
-        super(service, json);
+    CreateTaskHandler(TaskService<TaskWithId> service,
+                      Mapper json,
+                      IdemPotencyScopeKeyBuilder idemPotency,
+                      IdemPotencyStore idemPotencyStore) {
+        super(service, json, idemPotency, idemPotencyStore);
     }
 
     @Operation(summary = "Create a Task with Title, Description (optional), Status, Due date/time.")
@@ -49,13 +57,13 @@ public class CreateTaskHandler extends BaseTaskHandler
         @ApiResponse(responseCode = "500", description = "Other exceptions.", content = @Content)
     })
     @Override
-    protected Pair<String, Integer> handle(Action action, String request, Map<String, String> pathParams)
+    protected ResponseFields handle(Action action, String request, Map<String, String> pathParams)
         throws Exception {
 
         TaskWithId task = json.toEntity(request);
         TaskWithId taskWitId = service.createTask(task);
         String body = json.toJsonString(taskWitId);
 
-        return Pair.of(body, HttpStatusCode.CREATED);
+        return new ResponseFields(body, HttpStatusCode.CREATED, Header.JSON);
     }
 }

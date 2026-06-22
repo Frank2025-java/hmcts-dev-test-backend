@@ -256,7 +256,7 @@ You generate this only once, by:
 1. Navigate to Assets: `cd .\assets\`
 2. and execute `cdk init --language java`.
 
-#### CDK app line in _cdk.json_
+#### CDK app line in cdk.json
 After that, you need to edit _cdk.json_, to replace the maven command with a basic java command.
 Change the line to use basic Java to find the CDK application (mvn -e -q compile exec:java) with:
 
@@ -295,14 +295,14 @@ the functionality code plus runtime libraries.
    - (Optional) `aws sts get-caller-identity`    shows your account number
    - (Optional) `aws configure get region`       shows your region
 4. The CDK Synthesise Step, which generates Cloud Formation code.
-   - `cdk ls` executes the [app](#CDK-app-line-in-_cdkjson_) line in _cdk.json_, which flushes out errors
-   - `cdk synth`  executes [app](#CDK-app-line-in-_cdkjson_) and syntheses CloudFormation code in _cdk.out_
+   - `cdk ls` executes the [app line](#cdk-app-line-in-cdkjson) in _cdk.json_, which flushes out errors
+   - `cdk synth`  executes [app line](#cdk-app-line-in-cdkjson) and syntheses CloudFormation code in _cdk.out_
 5. The CDK Deploy Step generates the components inside AWS, and an S3 bucket and IAM roles.
    As part of the Deploy Step, CDK will upload _functions.jar_ to populate the Lambda components.
    To prepare for that, you run once per AWS account/region:
    - [Check your SSO user](img/AWS_Permissions.png)
    - (Only once ever) `cdk bootstrap <aws://account/region >` For example _aws://123456789012/us-east-1_
-   - `cdk deploy`      executes [app](#CDK-app-line-in-_cdkjson_) and deploys stack to your AWS account/region
+   - `cdk deploy`      executes [app line](#cdk-app-line-in-cdkjson) and deploys stack to your AWS account/region
    - `cdk diff`        compare deployed stack with current (local) state
 6. To remove the application you can
    - `cdk destroy`                                 completely remove the app and stacks

@@ -49,21 +49,20 @@ public class BackEndStack extends Stack {
     public BackEndStack(Construct scope, String id, StackProps props) {
         super(scope, id, props);
 
-        Table table = taskTableBuilder.build(this, "MyTable");
-        Table tableIdemPotency = idemPotencyTableBuilder.build(this, "MyTableIdemPotency");
-
         Function defaultLambda = rootTaskBuilder.build(this, "RootLambda");
         Function createLambda = createTaskBuilder.build(this, "CreateLambda");
         Function deleteLambda = deleteTaskBuilder.build(this, "DeleteLambda");
         Function retrieveLambda = retrieveTaskBuilder.build(this, "RetrieveLambda");
         Function updateLambda = updateTaskBuilder.build(this, "UpdateLambda");
 
+        Table table = taskTableBuilder.build(this, "MyTable");
         table.grant(defaultLambda, "dynamodb:DescribeTable");
         table.grant(createLambda, "dynamodb:PutItem");
         table.grant(deleteLambda, "dynamodb:DeleteItem");
         table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
         table.grant(updateLambda, "dynamodb:GetItem", "dynamodb:UpdateItem");
 
+        Table tableIdemPotency = idemPotencyTableBuilder.build(this, "MyTableIdemPotency");
         tableIdemPotency.grant(createLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");
         tableIdemPotency.grant(deleteLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");
         tableIdemPotency.grant(updateLambda, "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Scan");

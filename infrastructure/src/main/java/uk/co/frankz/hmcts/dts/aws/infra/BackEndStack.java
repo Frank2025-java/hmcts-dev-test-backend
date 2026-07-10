@@ -57,8 +57,8 @@ public class BackEndStack extends Stack {
 
         Table table = taskTableBuilder.build(this, "MyTable");
         table.grant(defaultLambda, "dynamodb:DescribeTable");
-        table.grant(createLambda, "dynamodb:PutItem");
-        table.grant(deleteLambda, "dynamodb:DeleteItem");
+        table.grant(createLambda,"dynamodb:GetItem", "dynamodb:PutItem");
+        table.grant(deleteLambda, "dynamodb:GetItem", "dynamodb:DeleteItem");
         table.grant(retrieveLambda, "dynamodb:GetItem", "dynamodb:Scan");
         table.grant(updateLambda, "dynamodb:GetItem", "dynamodb:UpdateItem");
 

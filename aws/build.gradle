@@ -42,7 +42,7 @@ test {
   useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   // SpringBoot prefers 17, GitHub CodeQL runs with 17, Lambda Infrastructure set to 17
   options.release = 17
 }

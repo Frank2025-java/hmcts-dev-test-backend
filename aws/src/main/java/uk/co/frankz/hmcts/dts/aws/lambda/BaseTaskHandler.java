@@ -92,6 +92,8 @@ abstract class BaseTaskHandler implements RequestHandler<APIGatewayV2HTTPEvent, 
             ResponseFields responseResult = null;
 
             if (idemPotencyKey.isPresent()) {
+                out.log("Idempotency key: " + idemPotencyKey.get().idempotencyKey());
+
                 Optional<IdemPotencyRecord> idemPotencyRecord = idemPotencyStore.findById(idemPotencyKey.get());
 
                 if (idemPotencyRecord.isPresent()) {
